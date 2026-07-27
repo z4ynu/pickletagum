@@ -1,0 +1,55 @@
+backend:
+  name: github
+  repo: z4ynu/pickletagum
+  branch: main
+  base_url: http://localhost:3000/api/cms-auth
+  auth_endpoint: auth
+
+media_folder: public/images/courts
+public_folder: /images/courts
+
+collections:
+  - name: directory
+    label: Court directory
+    files:
+      - name: courts
+        label: Courts
+        file: data/courts.json
+        format: json
+        fields:
+          - name: courts
+            label: Courts
+            label_singular: Court
+            widget: list
+            summary: "{{fields.name}} — {{fields.area}}"
+            fields:
+              - { name: id, label: ID, widget: string, hint: "Lowercase, hyphenated identifier (example: the-lob)." }
+              - { name: name, label: Venue name, widget: string }
+              - { name: area, label: Barangay or area, widget: string }
+              - name: types
+                label: Court environments
+                widget: select
+                multiple: true
+                options:
+                  - { label: Indoor, value: indoor }
+                  - { label: Outdoor, value: outdoor }
+              - { name: court_count, label: Number of courts, widget: number, value_type: int, required: false, default: 0 }
+              - { name: price_range, label: Price range, widget: string, required: false }
+              - name: image
+                label: Court photo
+                widget: object
+                fields:
+                  - { name: src, label: Image, widget: image, required: false }
+                  - { name: alt, label: Image description, widget: string, required: false, hint: "Describe what is visible in the photo." }
+              - name: booking_method
+                label: Booking method
+                widget: select
+                options:
+                  - { label: PickleHub, value: pickle_hub }
+                  - { label: Custom booking site, value: custom_site }
+                  - { label: Facebook, value: facebook }
+                  - { label: Phone, value: phone }
+              - { name: link, label: Booking or contact link, widget: string, hint: "Use a full URL, or tel:+63… for phone-only venues." }
+              - { name: facebook_link, label: Official Facebook page, widget: string, required: false }
+              - { name: note, label: Short listing note, widget: text }
+              - { name: last_verified, label: Last verified, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
