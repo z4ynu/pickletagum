@@ -2,6 +2,8 @@
 import '../styles/global.css';
 
 const { title = 'PickleTagum — Pickleball courts in Tagum City' } = Astro.props;
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
+const supabaseKey = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
 ---
 
 <!doctype html>
@@ -11,6 +13,8 @@ const { title = 'PickleTagum — Pickleball courts in Tagum City' } = Astro.prop
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="An independent directory of pickleball courts in Tagum City and their booking routes." />
     <title>{title}</title>
+    <script define:vars={{ supabaseUrl, supabaseKey }}>window.PICKLETAGUM_SUPABASE = { url: supabaseUrl, key: supabaseKey };</script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
   <body>
     <slot />

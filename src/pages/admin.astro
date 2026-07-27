@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="PickleTagum editor">
+  <main class="admin shell">
+    <p class="eyebrow eyebrow--dark"><span></span>Private editor</p>
+    <h1>Manage courts</h1>
+    <section id="login-panel"><p>Sign in with your approved email address.</p><form id="login-form"><input id="email" type="email" required placeholder="you@example.com" /><button>Send sign-in link</button></form><p id="login-message"></p></section>
+    <section id="editor" hidden><div class="admin__bar"><p id="admin-email"></p><button id="sign-out" class="secondary">Sign out</button></div><form id="court-form"><input name="id" required placeholder="ID (example: the-lob)" /><input name="name" required placeholder="Venue name" /><input name="area" required placeholder="Area / barangay" /><select name="types" multiple required><option value="indoor">Indoor</option><option value="outdoor">Outdoor</option></select><input name="court_count" type="number" min="0" value="0" placeholder="Court count" /><input name="price_range" placeholder="Price range" /><input name="image_src" placeholder="Image URL" /><input name="image_alt" placeholder="Image description" /><select name="booking_method"><option value="custom_site">Booking site</option><option value="pickle_hub">PickleHub</option><option value="facebook">Facebook</option><option value="phone">Phone</option></select><input name="link" required placeholder="Booking/contact link" /><input name="facebook_link" placeholder="Facebook page (optional)" /><textarea name="note" required placeholder="Short note"></textarea><input name="last_verified" type="date" required /><button>Save court</button></form><p id="editor-message"></p><div id="court-list"></div></section>
+  </main>
+  <script>
+    const config = window.PICKLETAGUM_SUPABASE;
+    const message = document.querySelector('#login-message');
+    if (!config.url || !config.key) message.textContent = 'Add the two PUBLIC_SUPABASE variables, then rebuild the site.';
+    else {
+      const client = window.supabase.createClient(config.url, config.key);
+      const loginPanel = document.querySelector('#login-panel'); const editor = document.querySelector('#editor'); const list = document.querySelector('#court-list'); const editorMessage = document.querySelector('#editor-message');
+      const show = async () => { const { data:{ user } } = await client.auth.getUser(); if (!user) return; const { data: admin } = await client.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle(); if (!admin) { message.textContent='This email is not approved as an editor.'; return; } loginPanel.hidden=true; editor.hidden=false; document.querySelector('#admin-email').textContent=user.email; const {data} = await client.from('courts').select('*').order('name'); list.innerHTML=(data||[]).map(c=>`<button data-id="${c.id}">${c.name} — edit</button>`).join(' '); };
+      document.querySelector('#login-form').addEventListener('submit', async e=>{e.preventDefault(); const {error}=await client.auth.signInWithOtp({email:document.querySelector('#email').value,options:{emailRedirectTo:location.href}}); message.textContent=error?error.message:'Check your email for the sign-in link.';});
+      document.querySelector('#sign-out').onclick=async()=>{await client.auth.signOut(); location.reload();};
+      document.querySelector('#court-form').addEventListener('submit',async e=>{e.preventDefault(); const f=new FormData(e.target); const row=Object.fromEntries(f); row.types=[...e.target.types.selectedOptions].map(o=>o.value); row.court_count=Number(row.court_count||0); for(const key of ['price_range','image_src','image_alt','facebook_link']) if(!row[key]) row[key]=null; const {error}=await client.from('courts').upsert(row); editorMessage.textContent=error?error.message:'Saved.'; if(!error) show();});
+      show();
+    }
+  </script>
+</BaseLayout>
