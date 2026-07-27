@@ -2,6 +2,7 @@
 const { court } = Astro.props;
 const labels = { pickle_hub: 'Book on PickleHub', custom_site: 'Visit booking site', facebook: 'Open Facebook', phone: 'Call venue' };
 const relativeDate = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${court.last_verified}T12:00:00`));
+const hasDetails = court.court_count > 0 || court.price_range;
 ---
 <article class={`court-card booking--${court.booking_method}`} data-court data-area={court.area} data-types={court.types.join(',')} data-search={`${court.name} ${court.area}`.toLowerCase()}>
   <div class="court-preview">
@@ -16,11 +17,10 @@ const relativeDate = new Intl.DateTimeFormat('en', { month: 'short', day: 'numer
   <div class="court-card__body">
     <div class="court-card__topline"><span>{court.area}</span></div>
     <h2>{court.name}</h2>
-    <div class="court-meta">
-      <span>{court.types.includes('indoor') && court.types.includes('outdoor') ? 'Indoor + open-air courts' : court.types.includes('indoor') ? 'Covered / indoor' : 'Open-air court'}</span>
+    {hasDetails && <div class="court-meta">
       {court.court_count > 0 && <span>{court.court_count} {court.court_count === 1 ? 'court' : 'courts'}</span>}
       {court.price_range && <span>{court.price_range}</span>}
-    </div>
+    </div>}
     <p>{court.note}</p>
     <div class="court-card__bottom">
       <time datetime={court.last_verified}>Checked {relativeDate}</time>
