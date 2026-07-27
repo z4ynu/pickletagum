@@ -61,6 +61,7 @@ Court data lives in a single static file: `data/courts.json`. No database for v1
 | `type` | `"indoor"` \| `"outdoor"` | |
 | `court_count` | number | number of courts on-site |
 | `price_range` | string \| null | optional, free text (e.g. `"₱150–200/hr"`) |
+| `image` | `{ src: string \| null, alt: string \| null }` | Court preview image. Use a site-relative path such as `"/images/courts/the-lob.jpg"`; leave both values `null` until an approved venue image is available. |
 | `booking_method` | `"pickle_hub"` \| `"custom_site"` \| `"facebook"` \| `"phone"` | drives which link/label/icon is shown |
 | `link` | string | URL, or a `tel:`/`mailto:` value for phone-only courts |
 | `note` | string | short human note, e.g. `"No online booking — message their FB page"` |
@@ -76,6 +77,10 @@ Example entry:
   "type": "outdoor",
   "court_count": 4,
   "price_range": "₱150–200/hr",
+  "image": {
+    "src": "/images/courts/magugpo-sports-hub.jpg",
+    "alt": "Four outdoor pickleball courts at Magugpo Sports Hub"
+  },
   "booking_method": "pickle_hub",
   "link": "https://pickle-hub.example/magugpo-sports-hub",
   "note": "Books through PickleHub's calendar.",
