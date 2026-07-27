@@ -14,7 +14,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
     <meta name="description" content="An independent directory of pickleball courts in Tagum City and their booking routes." />
     <title>{title}</title>
     <script define:vars={{ supabaseUrl, supabaseKey }}>window.PICKLETAGUM_SUPABASE = { url: supabaseUrl, key: supabaseKey };</script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
   <body>
     <slot />
