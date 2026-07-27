@@ -5,9 +5,8 @@ import DisclaimerBanner from '../components/DisclaimerBanner.astro';
 import FilterBar from '../components/FilterBar.astro';
 import CourtGrid from '../components/CourtGrid.astro';
 import Footer from '../components/Footer.astro';
-import courtDirectory from '../../data/courts.json';
+import courts from '../../data/courts.json';
 
-const courts = courtDirectory.courts;
 const areas = [...new Set(courts.map((court) => court.area))].sort();
 ---
 

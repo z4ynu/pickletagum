@@ -1,5 +1,4 @@
-{
-  "courts": [
+[
   {
     "id": "pickleballers-space",
     "name": "Pickleballers Space",
@@ -112,5 +111,4 @@
     "note": "Call to confirm the current drop-in rate, availability, and booking policy.",
     "last_verified": "2026-07-28"
   }
-  ]
-}
+]

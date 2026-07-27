@@ -51,7 +51,7 @@ Design direction should be explicitly locked (palette + type pairing + signature
 
 ## 5. Data Model
 
-Court data lives in a single static file: `data/courts.json`, with all entries under its `courts` array. No database for v1.
+Court data lives in a single static file: `data/courts.json`. No database for v1.
 
 | Field | Type | Notes |
 |---|---|---|
