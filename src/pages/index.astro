@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import DisclaimerBanner from '../components/DisclaimerBanner.astro';
+import FilterBar from '../components/FilterBar.astro';
+import CourtGrid from '../components/CourtGrid.astro';
+import Footer from '../components/Footer.astro';
+import courts from '../../data/courts.json';
+
+const areas = [...new Set(courts.map((court) => court.area))].sort();
+---
+
+<BaseLayout>
+  <main>
+    <Hero />
+    <DisclaimerBanner />
+    <FilterBar areas={areas} />
+    <CourtGrid courts={courts} />
+  </main>
+  <Footer />
+  <script src="../scripts/filter.js"></script>
+</BaseLayout>

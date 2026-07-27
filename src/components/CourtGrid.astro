@@ -1,0 +1,14 @@
+---
+import CourtCard from './CourtCard.astro';
+const { courts } = Astro.props;
+---
+<section class="court-section shell" aria-labelledby="court-list-heading">
+  <div class="section-heading">
+    <div><p class="eyebrow eyebrow--dark"><span></span>Directory</p><h2 id="court-list-heading">Courts to check out</h2></div>
+    <p id="results-count" aria-live="polite">{courts.length} places listed</p>
+  </div>
+  <div class="court-grid" id="court-grid">
+    {courts.map((court) => <CourtCard court={court} />)}
+  </div>
+  <p id="empty-state" class="empty-state" hidden>No courts match that search yet. Try another area or clear a filter.</p>
+</section>

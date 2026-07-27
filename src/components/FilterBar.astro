@@ -1,0 +1,17 @@
+---
+const { areas } = Astro.props;
+---
+<section class="filter-wrap shell" aria-label="Court filters">
+  <div class="filter-bar">
+    <div class="filter-group" role="group" aria-label="Filter by area">
+      <span class="filter-label">Area</span>
+      <button class="filter-chip is-active" data-area="all" type="button" aria-pressed="true">Everywhere</button>
+      {areas.map((area) => <button class="filter-chip" data-area={area} type="button" aria-pressed="false">{area}</button>)}
+    </div>
+    <div class="filter-group filter-group--type" role="group" aria-label="Filter by court type">
+      <span class="filter-label">Court</span>
+      <button class="filter-chip" data-type="indoor" type="button" aria-pressed="false">Indoor</button>
+      <button class="filter-chip" data-type="outdoor" type="button" aria-pressed="false">Outdoor</button>
+    </div>
+  </div>
+</section>
