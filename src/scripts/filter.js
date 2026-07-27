@@ -3,14 +3,14 @@ const cards = [...document.querySelectorAll('[data-court]')];
 const count = document.querySelector('#results-count');
 const empty = document.querySelector('#empty-state');
 let selectedArea = 'all';
-let selectedType = 'all';
+const selectedTypes = new Set();
 
 function update() {
   const term = search.value.trim().toLowerCase();
   let visible = 0;
   cards.forEach((card) => {
     const matches = (selectedArea === 'all' || card.dataset.area === selectedArea)
-      && (selectedType === 'all' || card.dataset.type === selectedType)
+      && (selectedTypes.size === 0 || card.dataset.types.split(',').some((type) => selectedTypes.has(type)))
       && card.dataset.search.includes(term);
     card.hidden = !matches;
     if (matches) visible += 1;
@@ -27,8 +27,8 @@ document.querySelectorAll('.filter-chip').forEach((button) => {
         if (item.classList.contains('filter-chip')) { item.classList.toggle('is-active', item === button); item.setAttribute('aria-pressed', item === button); }
       });
     } else {
-      selectedType = button.dataset.type === selectedType ? 'all' : button.dataset.type;
-      document.querySelectorAll('[data-type]').forEach((item) => { const active = item.dataset.type === selectedType; item.classList.toggle('is-active', active); item.setAttribute('aria-pressed', active); });
+      if (selectedTypes.has(button.dataset.type)) { selectedTypes.delete(button.dataset.type); } else { selectedTypes.add(button.dataset.type); }
+      document.querySelectorAll('[data-type]').forEach((item) => { const active = selectedTypes.has(item.dataset.type); item.classList.toggle('is-active', active); item.setAttribute('aria-pressed', active); });
     }
     update();
   });

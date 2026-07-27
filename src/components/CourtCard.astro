@@ -3,7 +3,7 @@ const { court } = Astro.props;
 const labels = { pickle_hub: 'Book on PickleHub', custom_site: 'Visit booking site', facebook: 'Open Facebook', phone: 'Call venue' };
 const relativeDate = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${court.last_verified}T12:00:00`));
 ---
-<article class={`court-card booking--${court.booking_method}`} data-court data-area={court.area} data-type={court.type} data-search={`${court.name} ${court.area}`.toLowerCase()}>
+<article class={`court-card booking--${court.booking_method}`} data-court data-area={court.area} data-types={court.types.join(',')} data-search={`${court.name} ${court.area}`.toLowerCase()}>
   <div class="court-preview">
     {court.image.src ? (
       <img src={court.image.src} alt={court.image.alt || `Preview of ${court.name}`} loading="lazy" />
@@ -11,13 +11,13 @@ const relativeDate = new Intl.DateTimeFormat('en', { month: 'short', day: 'numer
       <div class="court-preview__fallback" aria-label={`Photo for ${court.name} coming soon`} role="img"><span>Venue photo</span><strong>Coming soon</strong></div>
     )}
     <div class="rally-strip" aria-hidden="true"><span></span><i></i><b></b></div>
-    <span class="court-preview__badge">{court.type}</span>
+    <span class="court-preview__badge">{court.types.join(' + ')}</span>
   </div>
   <div class="court-card__body">
     <div class="court-card__topline"><span>{court.area}</span></div>
     <h2>{court.name}</h2>
     <div class="court-meta">
-      <span>{court.type === 'indoor' ? 'Covered / indoor' : 'Open-air court'}</span>
+      <span>{court.types.includes('indoor') && court.types.includes('outdoor') ? 'Indoor + open-air courts' : court.types.includes('indoor') ? 'Covered / indoor' : 'Open-air court'}</span>
       {court.court_count > 0 && <span>{court.court_count} {court.court_count === 1 ? 'court' : 'courts'}</span>}
       {court.price_range && <span>{court.price_range}</span>}
     </div>

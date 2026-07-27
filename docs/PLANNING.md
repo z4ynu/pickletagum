@@ -58,7 +58,7 @@ Court data lives in a single static file: `data/courts.json`. No database for v1
 | `id` | string | unique slug, e.g. `"magugpo-sports-hub"` |
 | `name` | string | court/venue name |
 | `area` | string | barangay/area |
-| `type` | `"indoor"` \| `"outdoor"` | |
+| `types` | `("indoor" \| "outdoor")[]` | One or both court environments, e.g. `["indoor", "outdoor"]`. |
 | `court_count` | number | number of courts on-site |
 | `price_range` | string \| null | optional, free text (e.g. `"₱150–200/hr"`) |
 | `image` | `{ src: string \| null, alt: string \| null }` | Court preview image. Use a site-relative path such as `"/images/courts/the-lob.jpg"`; leave both values `null` until an approved venue image is available. |
@@ -75,7 +75,7 @@ Example entry:
   "id": "magugpo-sports-hub",
   "name": "Magugpo Sports Hub",
   "area": "Magugpo Poblacion",
-  "type": "outdoor",
+  "types": ["outdoor", "indoor"],
   "court_count": 4,
   "price_range": "₱150–200/hr",
   "image": {
