@@ -64,6 +64,7 @@ Court data lives in a single static file: `data/courts.json`. No database for v1
 | `image` | `{ src: string \| null, alt: string \| null }` | Court preview image. Use a site-relative path such as `"/images/courts/the-lob.jpg"`; leave both values `null` until an approved venue image is available. |
 | `booking_method` | `"pickle_hub"` \| `"custom_site"` \| `"facebook"` \| `"phone"` | drives which link/label/icon is shown |
 | `link` | string | URL, or a `tel:`/`mailto:` value for phone-only courts |
+| `facebook_link` | string \| null | Optional official Facebook page. When present, the card shows a second “Visit Facebook page” action. |
 | `note` | string | short human note, e.g. `"No online booking — message their FB page"` |
 | `last_verified` | string (ISO date) | e.g. `"2026-07-20"` |
 
@@ -83,6 +84,7 @@ Example entry:
   },
   "booking_method": "pickle_hub",
   "link": "https://pickle-hub.example/magugpo-sports-hub",
+  "facebook_link": "https://www.facebook.com/example-court",
   "note": "Books through PickleHub's calendar.",
   "last_verified": "2026-07-25"
 }

@@ -24,7 +24,10 @@ const relativeDate = new Intl.DateTimeFormat('en', { month: 'short', day: 'numer
     <p>{court.note}</p>
     <div class="court-card__bottom">
       <time datetime={court.last_verified}>Checked {relativeDate}</time>
+      <div class="court-actions">
       <a href={court.link} target={court.link.startsWith('http') ? '_blank' : undefined} rel={court.link.startsWith('http') ? 'noreferrer' : undefined}>{labels[court.booking_method]} <span aria-hidden="true">↗</span></a>
+        {court.facebook_link && <a class="court-actions__facebook" href={court.facebook_link} target="_blank" rel="noreferrer">Visit Facebook page <span aria-hidden="true">↗</span></a>}
+      </div>
     </div>
   </div>
 </article>
