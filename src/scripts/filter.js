@@ -9,6 +9,12 @@ const empty = document.querySelector('#empty-state');
 const areaFilter = document.querySelector('#area-filter');
 const mobileAreaFilter = document.querySelector('.mobile-area-filter');
 const mobileAreaSummary = document.querySelector('#mobile-area-summary');
+const detailsDialog = document.querySelector('#court-details-dialog');
+const detailsImage = document.querySelector('#court-details-image');
+const detailsFallback = document.querySelector('#court-details-fallback');
+const detailsArea = document.querySelector('#court-details-area');
+const detailsTitle = document.querySelector('#court-details-title');
+const detailsNote = document.querySelector('#court-details-note');
 const config = window.PICKLETAGUM_SUPABASE;
 const labels = { pickle_hub: 'Book on PickleHub', custom_site: 'Visit booking site', facebook: 'Open Facebook', phone: 'Call venue' };
 let courts = [];
@@ -47,10 +53,10 @@ function cardMarkup(court) {
   const meta = details.length ? `<div class="court-meta">${details.map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}</div>` : '';
   const comingClass = court.is_coming_soon ? ' court-card--coming' : '';
   const desktopCard = `<article class="court-card court-card--desktop booking--${escapeHtml(court.booking_method)}${comingClass}">
-    <div class="court-preview">${preview}<div class="rally-strip" aria-hidden="true"><span></span><i></i><b></b></div>${court.is_coming_soon ? '' : `<span class="court-preview__badge">${escapeHtml(types.join(' + '))}</span>`}</div>
-    <div class="court-card__body"><div class="court-card__topline"><span>${escapeHtml(court.area)}</span></div><h2>${escapeHtml(court.name)}</h2>${meta}<p>${escapeHtml(court.note)}</p><div class="court-card__bottom"><div class="court-actions">${booking}${facebook}</div></div></div>
+    <div class="court-preview"><button class="court-preview-button" type="button" data-court-detail="${escapeHtml(court.id)}" aria-label="View details for ${escapeHtml(court.name)}">${preview}</button><div class="rally-strip" aria-hidden="true"><span></span><i></i><b></b></div>${court.is_coming_soon ? '' : `<span class="court-preview__badge">${escapeHtml(types.join(' + '))}</span>`}</div>
+    <div class="court-card__body"><div class="court-card__topline"><span>${escapeHtml(court.area)}</span></div><h2>${escapeHtml(court.name)}</h2>${meta}<div class="court-card__bottom"><div class="court-actions">${booking}${facebook}</div></div></div>
   </article>`;
-  const mobileCard = `<details class="mobile-court-card${court.is_coming_soon ? ' mobile-court-card--coming' : ''}"><summary><span class="mobile-court-card__copy"><span>${escapeHtml(court.area)}</span><strong>${escapeHtml(court.name)}</strong></span><span class="mobile-court-card__preview">${mobilePreview}</span></summary><div class="mobile-court-card__details">${meta}<p>${escapeHtml(court.note)}</p>${booking || facebook ? `<div class="court-actions">${booking}${facebook}</div>` : ''}</div></details>`;
+  const mobileCard = `<details class="mobile-court-card${court.is_coming_soon ? ' mobile-court-card--coming' : ''}"><summary><span class="mobile-court-card__copy"><span>${escapeHtml(court.area)}</span><strong>${escapeHtml(court.name)}</strong></span><span class="mobile-court-card__preview" data-court-detail="${escapeHtml(court.id)}" role="button" tabindex="0" aria-label="View details for ${escapeHtml(court.name)}">${mobilePreview}</span></summary><div class="mobile-court-card__details">${meta}${booking || facebook ? `<div class="court-actions">${booking}${facebook}</div>` : ''}</div></details>`;
   return `${desktopCard}${mobileCard}`;
 }
 
@@ -105,7 +111,22 @@ function syncAreaDropdown() {
   if (mobileAreaFilter) mobileAreaFilter.open = !window.matchMedia('(max-width: 560px)').matches;
 }
 
+function openCourtDetails(id) {
+  const court = courts.find((item) => item.id === id);
+  if (!court || !detailsDialog) return;
+  detailsArea.textContent = court.area;
+  detailsTitle.textContent = court.name;
+  detailsNote.textContent = court.note || 'No venue notes have been added yet.';
+  detailsImage.hidden = !court.image_src;
+  detailsFallback.hidden = Boolean(court.image_src);
+  if (court.image_src) { detailsImage.src = court.image_src; detailsImage.alt = court.image_alt || `Preview of ${court.name}`; }
+  detailsDialog.showModal();
+}
+
 document.addEventListener('click', (event) => {
+  const detailTrigger = event.target.closest('[data-court-detail]');
+  if (detailTrigger) { event.preventDefault(); openCourtDetails(detailTrigger.dataset.courtDetail); return; }
+  if (event.target.closest('.court-details-dialog__close')) { detailsDialog.close(); return; }
   const viewButton = event.target.closest('[data-view]');
   if (viewButton) { setView(viewButton.dataset.view); return; }
   const button = event.target.closest('.filter-chip');
@@ -132,6 +153,10 @@ document.addEventListener('click', (event) => {
 
 search.addEventListener('input', update);
 document.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); search.focus(); } });
+document.addEventListener('keydown', (event) => {
+  const detailTrigger = event.target.closest?.('[data-court-detail]');
+  if (detailTrigger && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); openCourtDetails(detailTrigger.dataset.courtDetail); }
+});
 
 async function loadCourts() {
   if (!config?.url || !config?.key) {
