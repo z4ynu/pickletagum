@@ -31,3 +31,5 @@ footer { padding:33px 0; color:rgba(255,255,255,.72); background:var(--ink-2); }
 /* The area list grows as new venues are added; keep court-type filters on a clear row. */
 .filter-bar { align-items:flex-start; flex-direction:column; }
 .filter-group--type { justify-content:flex-start; }
+
+.palm-t { display:inline-block; width:.48em; height:1.04em; margin:0 -.05em 0 -.02em; overflow:visible; vertical-align:-.19em; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:7; }
