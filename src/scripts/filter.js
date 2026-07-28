@@ -81,18 +81,6 @@ function setLoading(isLoading) {
   if (!isLoading) loading?.remove();
 }
 
-function setView(view) {
-  [grid, comingSoonGrid].forEach((courtGrid) => {
-    courtGrid.classList.toggle('court-grid--grid', view === 'grid');
-    courtGrid.classList.toggle('court-grid--list', view === 'list');
-  });
-  document.querySelectorAll('[data-view]').forEach((button) => {
-    const active = button.dataset.view === view;
-    button.classList.toggle('is-active', active);
-    button.setAttribute('aria-pressed', String(active));
-  });
-}
-
 function addAreaButtons() {
   const areas = [...new Set(courts.map((court) => court.area))].sort((a, b) => a.localeCompare(b));
   areaFilter.querySelectorAll('[data-area]:not([data-area="all"])').forEach((button) => button.remove());
@@ -126,8 +114,6 @@ document.addEventListener('click', (event) => {
   const detailTrigger = event.target.closest('[data-court-detail]');
   if (detailTrigger) { event.preventDefault(); openCourtDetails(detailTrigger.dataset.courtDetail); return; }
   if (event.target.closest('.court-details-dialog__close')) { detailsDialog.close(); return; }
-  const viewButton = event.target.closest('[data-view]');
-  if (viewButton) { setView(viewButton.dataset.view); return; }
   const button = event.target.closest('.filter-chip');
   if (!button) return;
   if (button.dataset.area) {
