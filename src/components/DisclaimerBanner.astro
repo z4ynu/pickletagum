@@ -6,5 +6,8 @@
 
 <script>
   const disclaimer = document.querySelector('#directory-disclaimer');
-  disclaimer?.querySelector('.disclaimer__close')?.addEventListener('click', () => disclaimer.remove());
+  disclaimer?.querySelector('.disclaimer__close')?.addEventListener('click', () => {
+    disclaimer.classList.add('is-dismissing');
+    disclaimer.addEventListener('animationend', () => disclaimer.remove(), { once: true });
+  });
 </script>

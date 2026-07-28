@@ -21,6 +21,7 @@ const labels = { pickle_hub: 'Book on PickleHub', custom_site: 'Visit booking si
 let courts = [];
 let selectedArea = 'all';
 const selectedTypes = new Set();
+let lastDetailTrigger = null;
 
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 const isExternal = (value) => /^https?:\/\//i.test(value || '');
@@ -104,20 +105,22 @@ function syncAreaDropdown() {
   if (mobileAreaFilter) mobileAreaFilter.open = !window.matchMedia('(max-width: 560px)').matches;
 }
 
-function openCourtDetails(id) {
+function openCourtDetails(id, trigger) {
   const court = courts.find((item) => item.id === id);
   if (!court || !detailsDialog) return;
+  lastDetailTrigger = trigger || null;
   detailsArea.textContent = court.area;
   detailsTitle.textContent = court.name;
   detailsNote.textContent = court.note || 'No venue notes have been added yet.';
   detailsImage.hidden = !court.image_src;
   if (court.image_src) { detailsImage.src = court.image_src; detailsImage.alt = court.image_alt || `Preview of ${court.name}`; }
   detailsDialog.showModal();
+  requestAnimationFrame(() => detailsDialog.querySelector('.court-details-dialog__close')?.focus());
 }
 
 document.addEventListener('click', (event) => {
   const detailTrigger = event.target.closest('[data-court-detail]');
-  if (detailTrigger) { event.preventDefault(); openCourtDetails(detailTrigger.dataset.courtDetail); return; }
+  if (detailTrigger) { event.preventDefault(); openCourtDetails(detailTrigger.dataset.courtDetail, detailTrigger); return; }
   if (event.target.closest('.court-details-dialog__close')) { detailsDialog.close(); return; }
   const button = event.target.closest('.filter-chip');
   if (!button) return;
@@ -146,7 +149,11 @@ search.addEventListener('input', update);
 document.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); search.focus(); } });
 document.addEventListener('keydown', (event) => {
   const detailTrigger = event.target.closest?.('[data-court-detail]');
-  if (detailTrigger && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); openCourtDetails(detailTrigger.dataset.courtDetail); }
+  if (detailTrigger && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); openCourtDetails(detailTrigger.dataset.courtDetail, detailTrigger); }
+});
+detailsDialog?.addEventListener('close', () => {
+  lastDetailTrigger?.focus();
+  lastDetailTrigger = null;
 });
 
 async function loadCourts() {
