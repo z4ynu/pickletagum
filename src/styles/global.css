@@ -37,3 +37,22 @@ footer { padding:33px 0; color:rgba(255,255,255,.72); background:var(--ink-2); }
 .court-section .court-card__bottom { justify-content:flex-end; }
 .court-card--coming { filter:grayscale(.82); opacity:.74; }
 .developer-watermark { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:24px; padding-top:16px; color:rgba(255,255,255,.48); border-top:1px solid rgba(255,255,255,.13); font-size:.7rem; letter-spacing:.03em; }.developer-watermark strong { color:var(--lime); }.developer-watermark nav { display:flex; flex-wrap:wrap; gap:12px; }.developer-watermark a { color:inherit; text-decoration:none; }.developer-watermark a:hover,.developer-watermark a:focus-visible { color:var(--lime); outline:none; } @media(max-width:560px){.developer-watermark{align-items:flex-start;flex-direction:column;gap:10px;}}
+.mobile-court-links { display:none; }
+@media(max-width:560px){
+  .filter-group { flex-wrap:nowrap; max-width:100%; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin; }
+  .filter-label,.filter-chip { flex:none; white-space:nowrap; }
+  .court-section .court-grid { grid-auto-rows:auto; }
+  .court-section .court-card { height:auto; }
+  .court-section .court-preview { height:132px; }
+  .court-section .court-card__body { height:auto; min-height:205px; padding:14px 16px; }
+  .court-section .court-card h2 { margin:8px 0 9px; font-size:1.5rem; }
+  .court-section .court-card__body > p { -webkit-line-clamp:2; margin:9px 0 12px; font-size:.76rem; }
+  .court-section .court-card__bottom { display:block; min-height:0; margin-top:auto; }
+  .court-actions--desktop { display:none; }
+  .mobile-court-links { display:block; }
+  .mobile-court-links summary { display:flex; align-items:center; justify-content:center; min-height:35px; color:var(--white); background:var(--ink); border-radius:5px; font-size:.77rem; font-weight:700; list-style:none; cursor:pointer; }
+  .mobile-court-links summary::-webkit-details-marker { display:none; }
+  .mobile-court-links[open] summary { margin-bottom:10px; }
+  .mobile-court-links .court-actions { align-items:stretch; }
+  .mobile-court-links .court-actions a { justify-content:center; min-height:30px; padding:5px 8px; background:var(--paper-deep); border-bottom:0; border-radius:4px; }
+}

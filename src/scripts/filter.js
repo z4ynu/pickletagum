@@ -35,6 +35,7 @@ function cardMarkup(court) {
   const facebookHref = safeHref(court.facebook_link);
   const booking = bookingHref ? `<a href="${escapeHtml(bookingHref)}"${isExternal(bookingHref) ? ' target="_blank" rel="noreferrer"' : ''}>${escapeHtml(labels[court.booking_method] || 'Visit booking site')} <span aria-hidden="true">↗</span></a>` : '';
   const facebook = facebookHref ? `<a class="court-actions__facebook" href="${escapeHtml(facebookHref)}" target="_blank" rel="noreferrer">Visit Facebook page <span aria-hidden="true">↗</span></a>` : '';
+  const mobileActions = booking || facebook ? `<details class="mobile-court-links"><summary>View court</summary><div class="court-actions">${booking}${facebook}</div></details>` : '';
   const preview = court.image_src
     ? `<img src="${escapeHtml(court.image_src)}" alt="${escapeHtml(court.image_alt || `Preview of ${court.name}`)}" loading="lazy">`
     : `<div class="court-preview__fallback" aria-label="Photo for ${escapeHtml(court.name)} coming soon" role="img"><span>Venue photo</span><strong>Coming soon</strong></div>`;
@@ -43,7 +44,7 @@ function cardMarkup(court) {
     <div class="court-preview">${preview}<div class="rally-strip" aria-hidden="true"><span></span><i></i><b></b></div>${court.is_coming_soon ? '' : `<span class="court-preview__badge">${escapeHtml(types.join(' + '))}</span>`}</div>
     <div class="court-card__body"><div class="court-card__topline"><span>${escapeHtml(court.area)}</span></div><h2>${escapeHtml(court.name)}</h2>
     ${details.length ? `<div class="court-meta">${details.map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}</div>` : ''}
-    <p>${escapeHtml(court.note)}</p><div class="court-card__bottom"><div class="court-actions">${booking}${facebook}</div></div></div></article>`;
+    <p>${escapeHtml(court.note)}</p><div class="court-card__bottom"><div class="court-actions court-actions--desktop">${booking}${facebook}</div>${mobileActions}</div></div></article>`;
 }
 
 function update() {
