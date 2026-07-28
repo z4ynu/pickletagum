@@ -102,7 +102,9 @@ function addAreaButtons() {
 }
 
 function syncAreaDropdown() {
-  if (mobileAreaFilter) mobileAreaFilter.open = !window.matchMedia('(max-width: 560px)').matches;
+  const isMobile = window.matchMedia('(max-width: 560px)').matches;
+  if (mobileAreaFilter) mobileAreaFilter.open = !isMobile;
+  if (moreAreasFilter) moreAreasFilter.open = isMobile;
 }
 
 function openCourtDetails(id, trigger) {
@@ -132,7 +134,7 @@ document.addEventListener('click', (event) => {
       item.setAttribute('aria-pressed', String(active));
     });
     if (mobileAreaSummary) mobileAreaSummary.textContent = `Area: ${button.textContent}`;
-    if (moreAreasFilter) moreAreasFilter.open = false;
+    if (moreAreasFilter && !window.matchMedia('(max-width: 560px)').matches) moreAreasFilter.open = false;
     if (window.matchMedia('(max-width: 560px)').matches && mobileAreaFilter) mobileAreaFilter.open = false;
   } else if (button.dataset.type) {
     if (selectedTypes.has(button.dataset.type)) selectedTypes.delete(button.dataset.type); else selectedTypes.add(button.dataset.type);
