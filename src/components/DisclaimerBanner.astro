@@ -1,4 +1,10 @@
-<aside class="disclaimer shell" aria-label="Directory disclaimer">
+<aside class="disclaimer shell" id="directory-disclaimer" aria-label="Directory disclaimer">
   <div class="disclaimer__mark" aria-hidden="true">!</div>
-  <p><strong>Independent, not the booking desk.</strong> PickleTagum is not affiliated with the courts or platforms listed. Reservations, accounts, and payments happen only on each venue’s own page.</p>
+  <p><strong>Independent, not the booking desk.</strong> PickleTagum is not affiliated with the courts or platforms listed; reservations, accounts, and payments happen only on each venue's own page. <strong>Base prices only.</strong> Any system, transfer, or payment-service fees (such as GCash, GoTyme, or other providers) are set by the venue or provider and are outside PickleTagum's control.</p>
+  <button class="disclaimer__close" type="button" aria-label="Close directory disclaimer">×</button>
 </aside>
+
+<script>
+  const disclaimer = document.querySelector('#directory-disclaimer');
+  disclaimer?.querySelector('.disclaimer__close')?.addEventListener('click', () => disclaimer.remove());
+</script>
