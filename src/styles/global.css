@@ -34,3 +34,5 @@ footer { padding:33px 0; color:rgba(255,255,255,.72); background:var(--ink-2); }
 
 .palm-t { display:inline-block; width:.48em; height:1.04em; margin:0 -.05em 0 -.02em; overflow:visible; vertical-align:-.19em; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:7; }
 .disclaimer__close { flex:none; width:26px; height:26px; padding:0; color:var(--ink-2); background:transparent; border:0; border-radius:50%; font-size:1.45rem; line-height:1; }.disclaimer__close:hover,.disclaimer__close:focus-visible { color:var(--white); background:var(--ink-2); outline:none; }
+.court-section .court-card__bottom { justify-content:flex-end; }
+.court-card--coming { filter:grayscale(.82); opacity:.74; }

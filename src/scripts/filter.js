@@ -15,7 +15,6 @@ const selectedTypes = new Set();
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 const isExternal = (value) => /^https?:\/\//i.test(value || '');
 const safeHref = (value) => /^(https?:\/\/|tel:|mailto:|\/)/i.test(String(value ?? '').trim()) ? String(value).trim() : '';
-const formatDate = (value) => value ? new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${value}T12:00:00`)) : '';
 const formatPrice = (value) => {
   const raw = String(value ?? '').trim();
   if (!raw || raw.includes('₱')) return raw;
@@ -35,11 +34,11 @@ function cardMarkup(court) {
     ? `<img src="${escapeHtml(court.image_src)}" alt="${escapeHtml(court.image_alt || `Preview of ${court.name}`)}" loading="lazy">`
     : `<div class="court-preview__fallback" aria-label="Photo for ${escapeHtml(court.name)} coming soon" role="img"><span>Venue photo</span><strong>Coming soon</strong></div>`;
 
-  return `<article class="court-card booking--${escapeHtml(court.booking_method)}" data-court data-area="${escapeHtml(court.area)}" data-types="${escapeHtml(types.join(','))}" data-search="${escapeHtml(`${court.name} ${court.area}`.toLowerCase())}">
-    <div class="court-preview">${preview}<div class="rally-strip" aria-hidden="true"><span></span><i></i><b></b></div><span class="court-preview__badge">${escapeHtml(types.join(' + '))}</span></div>
+  return `<article class="court-card booking--${escapeHtml(court.booking_method)}${court.is_coming_soon ? ' court-card--coming' : ''}" data-court data-area="${escapeHtml(court.area)}" data-types="${escapeHtml(types.join(','))}" data-search="${escapeHtml(`${court.name} ${court.area}`.toLowerCase())}">
+    <div class="court-preview">${preview}<div class="rally-strip" aria-hidden="true"><span></span><i></i><b></b></div>${court.is_coming_soon ? '' : `<span class="court-preview__badge">${escapeHtml(types.join(' + '))}</span>`}</div>
     <div class="court-card__body"><div class="court-card__topline"><span>${escapeHtml(court.area)}</span></div><h2>${escapeHtml(court.name)}</h2>
     ${details.length ? `<div class="court-meta">${details.map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}</div>` : ''}
-    <p>${escapeHtml(court.note)}</p><div class="court-card__bottom">${court.last_verified ? `<time datetime="${escapeHtml(court.last_verified)}">Checked ${escapeHtml(formatDate(court.last_verified))}</time>` : '<span></span>'}<div class="court-actions">${booking}${facebook}</div></div></div></article>`;
+    <p>${escapeHtml(court.note)}</p><div class="court-card__bottom"><div class="court-actions">${booking}${facebook}</div></div></div></article>`;
 }
 
 function update() {
