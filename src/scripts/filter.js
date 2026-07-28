@@ -11,7 +11,6 @@ const mobileAreaFilter = document.querySelector('.mobile-area-filter');
 const mobileAreaSummary = document.querySelector('#mobile-area-summary');
 const detailsDialog = document.querySelector('#court-details-dialog');
 const detailsImage = document.querySelector('#court-details-image');
-const detailsFallback = document.querySelector('#court-details-fallback');
 const detailsArea = document.querySelector('#court-details-area');
 const detailsTitle = document.querySelector('#court-details-title');
 const detailsNote = document.querySelector('#court-details-note');
@@ -118,7 +117,6 @@ function openCourtDetails(id) {
   detailsTitle.textContent = court.name;
   detailsNote.textContent = court.note || 'No venue notes have been added yet.';
   detailsImage.hidden = !court.image_src;
-  detailsFallback.hidden = Boolean(court.image_src);
   if (court.image_src) { detailsImage.src = court.image_src; detailsImage.alt = court.image_alt || `Preview of ${court.name}`; }
   detailsDialog.showModal();
 }
