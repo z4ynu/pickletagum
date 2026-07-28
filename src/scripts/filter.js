@@ -1,5 +1,6 @@
 const search = document.querySelector('#court-search');
 const grid = document.querySelector('#court-grid');
+const loading = document.querySelector('#court-loading');
 const comingSoonGrid = document.querySelector('#coming-soon-grid');
 const comingSoonSection = document.querySelector('#coming-soon-section');
 const comingSoonCount = document.querySelector('#coming-soon-count');
@@ -24,10 +25,10 @@ const safeHref = (value) => {
 };
 const formatPrice = (value) => {
   const raw = String(value ?? '').trim();
-  if (!raw || raw.includes('₱')) return raw;
+  if (!raw || raw.includes('\u20b1')) return raw;
   const amount = raw.replace(/\/?\s*(hr|hour)s?\.?$/i, '').trim();
-  if (!/^\d+(?:\s*[-–]\s*\d+)?$/.test(amount)) return raw;
-  return `₱${amount.replace(/\s*[-–]\s*/, '–')}/hr.`;
+  if (!/^\d+(?:\s*[-\u2013]\s*\d+)?$/.test(amount)) return raw;
+  return `\u20b1${amount.replace(/\s*[-\u2013]\s*/, '\u2013')}/hr.`;
 };
 
 function cardMarkup(court) {
@@ -35,21 +36,21 @@ function cardMarkup(court) {
   const details = [court.court_count > 0 ? `${court.court_count} ${court.court_count === 1 ? 'court' : 'courts'}` : '', formatPrice(court.price_range)].filter(Boolean);
   const bookingHref = safeHref(court.link);
   const facebookHref = safeHref(court.facebook_link);
-  const booking = bookingHref ? `<a href="${escapeHtml(bookingHref)}"${isExternal(bookingHref) ? ' target="_blank" rel="noreferrer"' : ''}>${escapeHtml(labels[court.booking_method] || 'Visit booking site')} <span aria-hidden="true">↗</span></a>` : '';
-  const facebook = facebookHref ? `<a class="court-actions__facebook" href="${escapeHtml(facebookHref)}" target="_blank" rel="noreferrer">Visit Facebook page <span aria-hidden="true">↗</span></a>` : '';
+  const booking = bookingHref ? `<a class="court-action-button" href="${escapeHtml(bookingHref)}"${isExternal(bookingHref) ? ' target="_blank" rel="noreferrer"' : ''}>${escapeHtml(labels[court.booking_method] || 'Visit booking site')} <span aria-hidden="true">&rarr;</span></a>` : '';
+  const facebook = facebookHref ? `<a class="court-action-button court-action-button--facebook" href="${escapeHtml(facebookHref)}" target="_blank" rel="noreferrer">Visit Facebook page <span aria-hidden="true">&rarr;</span></a>` : '';
   const preview = court.image_src
     ? `<img src="${escapeHtml(court.image_src)}" alt="${escapeHtml(court.image_alt || `Preview of ${court.name}`)}" loading="lazy">`
     : `<div class="court-preview__fallback" aria-label="Photo for ${escapeHtml(court.name)} coming soon" role="img"><span>Venue photo</span><strong>Coming soon</strong></div>`;
   const mobilePreview = court.image_src
     ? `<img src="${escapeHtml(court.image_src)}" alt="${escapeHtml(court.image_alt || `Preview of ${court.name}`)}" loading="lazy">`
     : `<span class="mobile-court-card__fallback" aria-hidden="true">Coming soon</span>`;
-  const desktopCard = `<article class="court-card court-card--desktop booking--${escapeHtml(court.booking_method)}${court.is_coming_soon ? ' court-card--coming' : ''}" data-court data-area="${escapeHtml(court.area)}" data-types="${escapeHtml(types.join(','))}" data-search="${escapeHtml(`${court.name} ${court.area}`.toLowerCase())}">
+  const meta = details.length ? `<div class="court-meta">${details.map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}</div>` : '';
+  const comingClass = court.is_coming_soon ? ' court-card--coming' : '';
+  const desktopCard = `<article class="court-card court-card--desktop booking--${escapeHtml(court.booking_method)}${comingClass}">
     <div class="court-preview">${preview}<div class="rally-strip" aria-hidden="true"><span></span><i></i><b></b></div>${court.is_coming_soon ? '' : `<span class="court-preview__badge">${escapeHtml(types.join(' + '))}</span>`}</div>
-    <div class="court-card__body"><div class="court-card__topline"><span>${escapeHtml(court.area)}</span></div><h2>${escapeHtml(court.name)}</h2>
-    ${details.length ? `<div class="court-meta">${details.map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}</div>` : ''}
-    <p>${escapeHtml(court.note)}</p><div class="court-card__bottom"><div class="court-actions">${booking}${facebook}</div></div></div></article>`;
-  const mobileCard = `<details class="mobile-court-card${court.is_coming_soon ? ' mobile-court-card--coming' : ''}"><summary><span class="mobile-court-card__copy"><span>${escapeHtml(court.area)}</span><strong>${escapeHtml(court.name)}</strong></span><span class="mobile-court-card__preview">${mobilePreview}</span></summary><div class="mobile-court-card__details">${details.length ? `<div class="court-meta">${details.map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}</div>` : ''}<p>${escapeHtml(court.note)}</p>${booking || facebook ? `<div class="court-actions">${booking}${facebook}</div>` : ''}</div></details>`;
-
+    <div class="court-card__body"><div class="court-card__topline"><span>${escapeHtml(court.area)}</span></div><h2>${escapeHtml(court.name)}</h2>${meta}<p>${escapeHtml(court.note)}</p><div class="court-card__bottom"><div class="court-actions">${booking}${facebook}</div></div></div>
+  </article>`;
+  const mobileCard = `<details class="mobile-court-card${court.is_coming_soon ? ' mobile-court-card--coming' : ''}"><summary><span class="mobile-court-card__copy"><span>${escapeHtml(court.area)}</span><strong>${escapeHtml(court.name)}</strong></span><span class="mobile-court-card__preview">${mobilePreview}</span></summary><div class="mobile-court-card__details">${meta}<p>${escapeHtml(court.note)}</p>${booking || facebook ? `<div class="court-actions">${booking}${facebook}</div>` : ''}</div></details>`;
   return `${desktopCard}${mobileCard}`;
 }
 
@@ -69,6 +70,23 @@ function update() {
   if (!available.length) empty.textContent = courts.length ? 'No available courts match that search yet. Try another area or clear a filter.' : 'No courts have been added yet.';
 }
 
+function setLoading(isLoading) {
+  grid.classList.toggle('is-loading', isLoading);
+  if (!isLoading) loading?.remove();
+}
+
+function setView(view) {
+  [grid, comingSoonGrid].forEach((courtGrid) => {
+    courtGrid.classList.toggle('court-grid--grid', view === 'grid');
+    courtGrid.classList.toggle('court-grid--list', view === 'list');
+  });
+  document.querySelectorAll('[data-view]').forEach((button) => {
+    const active = button.dataset.view === view;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+
 function addAreaButtons() {
   const areas = [...new Set(courts.map((court) => court.area))].sort((a, b) => a.localeCompare(b));
   areaFilter.querySelectorAll('[data-area]:not([data-area="all"])').forEach((button) => button.remove());
@@ -84,11 +102,12 @@ function addAreaButtons() {
 }
 
 function syncAreaDropdown() {
-  if (!mobileAreaFilter) return;
-  mobileAreaFilter.open = !window.matchMedia('(max-width: 560px)').matches;
+  if (mobileAreaFilter) mobileAreaFilter.open = !window.matchMedia('(max-width: 560px)').matches;
 }
 
 document.addEventListener('click', (event) => {
+  const viewButton = event.target.closest('[data-view]');
+  if (viewButton) { setView(viewButton.dataset.view); return; }
   const button = event.target.closest('.filter-chip');
   if (!button) return;
   if (button.dataset.area) {
@@ -99,7 +118,7 @@ document.addEventListener('click', (event) => {
       item.setAttribute('aria-pressed', String(active));
     });
     if (mobileAreaSummary) mobileAreaSummary.textContent = `Area: ${button.textContent}`;
-    if (window.matchMedia('(max-width: 560px)').matches) mobileAreaFilter.open = false;
+    if (window.matchMedia('(max-width: 560px)').matches && mobileAreaFilter) mobileAreaFilter.open = false;
   } else if (button.dataset.type) {
     if (selectedTypes.has(button.dataset.type)) selectedTypes.delete(button.dataset.type); else selectedTypes.add(button.dataset.type);
     document.querySelectorAll('[data-type].filter-chip').forEach((item) => {
@@ -116,6 +135,7 @@ document.addEventListener('keydown', (event) => { if ((event.metaKey || event.ct
 
 async function loadCourts() {
   if (!config?.url || !config?.key) {
+    setLoading(false);
     count.textContent = 'Courts unavailable';
     empty.textContent = 'The court directory is not configured yet.';
     empty.hidden = false;
@@ -132,8 +152,10 @@ async function loadCourts() {
     courts = await response.json();
     addAreaButtons();
     syncAreaDropdown();
+    setLoading(false);
     update();
   } catch (error) {
+    setLoading(false);
     count.textContent = 'Courts unavailable';
     empty.textContent = error.name === 'AbortError'
       ? 'Loading the court directory took too long. Please refresh and try again.'

@@ -1,9 +1,17 @@
 <section class="court-section shell" aria-labelledby="court-list-heading">
   <div class="section-heading">
     <div><p class="eyebrow eyebrow--dark"><span></span>Directory</p><h2 id="court-list-heading">Courts to check out</h2></div>
-    <p id="results-count" aria-live="polite">Loading courts…</p>
+    <div class="directory-tools">
+      <p id="results-count" aria-live="polite">Loading courts...</p>
+      <div class="view-toggle" role="group" aria-label="Directory layout">
+        <button type="button" class="is-active" data-view="grid" aria-pressed="true">Grid</button>
+        <button type="button" data-view="list" aria-pressed="false">List</button>
+      </div>
+    </div>
   </div>
-  <div class="court-grid" id="court-grid" aria-live="polite"></div>
+  <div class="court-grid court-grid--grid" id="court-grid" aria-live="polite">
+    <div class="court-loading" id="court-loading" aria-label="Loading courts"><span></span><span></span><span></span></div>
+  </div>
   <p id="empty-state" class="empty-state" hidden></p>
 </section>
 
@@ -12,5 +20,5 @@
     <div><p class="eyebrow eyebrow--dark"><span></span>On the way</p><h2 id="coming-soon-heading">Coming soon</h2></div>
     <p id="coming-soon-count" aria-live="polite"></p>
   </div>
-  <div class="court-grid" id="coming-soon-grid"></div>
+  <div class="court-grid court-grid--grid" id="coming-soon-grid"></div>
 </section>
