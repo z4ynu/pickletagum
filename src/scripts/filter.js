@@ -63,7 +63,7 @@ function update() {
   const comingSoon = visible.filter((court) => court.is_coming_soon);
   grid.innerHTML = available.map(cardMarkup).join('');
   comingSoonGrid.innerHTML = comingSoon.map(cardMarkup).join('');
-  count.textContent = `${available.length} ${available.length === 1 ? 'place' : 'places'} listed`;
+  if (count) count.textContent = `${available.length} ${available.length === 1 ? 'place' : 'places'} listed`;
   comingSoonCount.textContent = `${comingSoon.length} ${comingSoon.length === 1 ? 'place' : 'places'} announced`;
   comingSoonSection.hidden = comingSoon.length === 0;
   empty.hidden = available.length !== 0;
@@ -136,7 +136,7 @@ document.addEventListener('keydown', (event) => { if ((event.metaKey || event.ct
 async function loadCourts() {
   if (!config?.url || !config?.key) {
     setLoading(false);
-    count.textContent = 'Courts unavailable';
+    if (count) count.textContent = 'Courts unavailable';
     empty.textContent = 'The court directory is not configured yet.';
     empty.hidden = false;
     return;
@@ -156,7 +156,7 @@ async function loadCourts() {
     update();
   } catch (error) {
     setLoading(false);
-    count.textContent = 'Courts unavailable';
+    if (count) count.textContent = 'Courts unavailable';
     empty.textContent = error.name === 'AbortError'
       ? 'Loading the court directory took too long. Please refresh and try again.'
       : 'Could not load the court directory. Please try again shortly.';
