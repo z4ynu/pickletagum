@@ -41,7 +41,8 @@ footer { padding:33px 0; color:rgba(255,255,255,.72); background:var(--ink-2); }
 @media(max-width:560px){
   .filter-wrap { position:sticky; top:0; z-index:4; padding-top:10px; background:var(--paper); }
   .filter-group { flex-wrap:nowrap; max-width:100%; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin; }
-  .filter-label,.filter-chip { flex:none; white-space:nowrap; }
+  .filter-label { width:auto; flex:none; white-space:nowrap; }
+  .filter-chip { flex:none; white-space:nowrap; }
   .court-section .court-grid { grid-auto-rows:auto; gap:10px; }
   .court-card--desktop { display:none; }
   .mobile-court-card { display:block; overflow:hidden; color:var(--ink); background:var(--white); border:1px solid rgba(18,59,50,.1); border-radius:0 14px 0 14px; }
@@ -57,6 +58,6 @@ footer { padding:33px 0; color:rgba(255,255,255,.72); background:var(--ink-2); }
   .mobile-court-card__details .court-meta { margin-top:12px; }
   .mobile-court-card__details p { display:-webkit-box; margin:10px 0 13px; overflow:hidden; color:var(--muted); font-size:.76rem; line-height:1.45; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
   .mobile-court-card__details .court-actions { align-items:stretch; }
-  .mobile-court-card__details .court-actions a { justify-content:center; min-height:30px; padding:5px 8px; background:var(--paper-deep); border-bottom:0; border-radius:4px; }
+  .mobile-court-card__details .court-actions a { display:inline-flex; gap:4px; align-items:center; justify-content:center; min-height:30px; padding:5px 8px; color:var(--ink); background:var(--paper-deep); border-bottom:0; border-radius:4px; font-family:'DM Sans',sans-serif; font-size:.76rem; font-weight:700; text-decoration:none; }
   .mobile-court-card--coming { filter:grayscale(.82); opacity:.74; }
 }
