@@ -157,6 +157,9 @@ detailsDialog?.addEventListener('close', () => {
   lastDetailTrigger?.focus();
   lastDetailTrigger = null;
 });
+detailsDialog?.addEventListener('click', (event) => {
+  if (event.target === detailsDialog) detailsDialog.close();
+});
 
 async function loadCourts() {
   if (!config?.url || !config?.key) {
