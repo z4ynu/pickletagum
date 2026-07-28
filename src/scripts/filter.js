@@ -79,23 +79,32 @@ search.addEventListener('input', update);
 document.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); search.focus(); } });
 
 async function loadCourts() {
-  if (!config?.url || !config?.key || !window.supabase) {
+  if (!config?.url || !config?.key) {
     count.textContent = 'Courts unavailable';
     empty.textContent = 'The court directory is not configured yet.';
     empty.hidden = false;
     return;
   }
-  const client = window.supabase.createClient(config.url, config.key);
-  const { data, error } = await client.from('courts').select('*').order('name');
-  if (error) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 10000);
+  try {
+    const response = await fetch(`${config.url}/rest/v1/courts?select=*&order=name`, {
+      headers: { apikey: config.key, Authorization: `Bearer ${config.key}` },
+      signal: controller.signal,
+    });
+    if (!response.ok) throw new Error(`Could not load courts (${response.status})`);
+    courts = await response.json();
+    addAreaButtons();
+    update();
+  } catch (error) {
     count.textContent = 'Courts unavailable';
-    empty.textContent = 'Could not load the court directory. Please try again shortly.';
+    empty.textContent = error.name === 'AbortError'
+      ? 'Loading the court directory took too long. Please refresh and try again.'
+      : 'Could not load the court directory. Please try again shortly.';
     empty.hidden = false;
-    return;
+  } finally {
+    window.clearTimeout(timeout);
   }
-  courts = data || [];
-  addAreaButtons();
-  update();
 }
 
 loadCourts();
