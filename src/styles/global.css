@@ -89,3 +89,8 @@ footer { padding:33px 0; color:rgba(255,255,255,.72); background:var(--ink-2); }
   .court-loading { grid-template-columns:1fr; gap:10px; }.court-loading span { min-height:86px; border-radius:0 14px 0 14px; }.court-loading span:nth-child(n+2) { display:none; }
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}}
+
+/* Keep long venue notes inside their fixed-size public cards. */
+.court-section .court-card__body { min-width:0; overflow:hidden; }
+.court-section .court-card__body > p { max-height:3.9em; overflow:hidden; overflow-wrap:anywhere; }
+.court-section .court-card__bottom { flex-shrink:0; }
