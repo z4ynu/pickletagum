@@ -15,7 +15,7 @@ create table public.courts (
   image_src text,
   image_alt text,
   booking_method text not null check (booking_method in ('pickle_hub', 'custom_site', 'facebook', 'phone')),
-  link text not null,
+  link text,
   facebook_link text,
   note text not null,
   is_coming_soon boolean not null default false,

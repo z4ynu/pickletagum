@@ -1,6 +1,6 @@
 # Court images
 
-Place approved court photos in this folder and reference them from `data/courts.json`.
+Court photos are uploaded through the private `/admin` editor and stored in the public Supabase `court-images` bucket. This folder is kept only for optional static site assets.
 
 ```json
 "image": {

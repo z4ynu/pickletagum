@@ -14,6 +14,7 @@ const selectedTypes = new Set();
 
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 const isExternal = (value) => /^https?:\/\//i.test(value || '');
+const safeHref = (value) => /^(https?:\/\/|tel:|mailto:|\/)/i.test(String(value ?? '').trim()) ? String(value).trim() : '';
 const formatDate = (value) => value ? new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${value}T12:00:00`)) : '';
 const formatPrice = (value) => {
   const raw = String(value ?? '').trim();
@@ -26,8 +27,10 @@ const formatPrice = (value) => {
 function cardMarkup(court) {
   const types = Array.isArray(court.types) ? court.types : [];
   const details = [court.court_count > 0 ? `${court.court_count} ${court.court_count === 1 ? 'court' : 'courts'}` : '', formatPrice(court.price_range)].filter(Boolean);
-  const booking = court.link ? `<a href="${escapeHtml(court.link)}"${isExternal(court.link) ? ' target="_blank" rel="noreferrer"' : ''}>${escapeHtml(labels[court.booking_method] || 'Visit booking site')} <span aria-hidden="true">↗</span></a>` : '';
-  const facebook = court.facebook_link ? `<a class="court-actions__facebook" href="${escapeHtml(court.facebook_link)}" target="_blank" rel="noreferrer">Visit Facebook page <span aria-hidden="true">↗</span></a>` : '';
+  const bookingHref = safeHref(court.link);
+  const facebookHref = safeHref(court.facebook_link);
+  const booking = bookingHref ? `<a href="${escapeHtml(bookingHref)}"${isExternal(bookingHref) ? ' target="_blank" rel="noreferrer"' : ''}>${escapeHtml(labels[court.booking_method] || 'Visit booking site')} <span aria-hidden="true">↗</span></a>` : '';
+  const facebook = facebookHref ? `<a class="court-actions__facebook" href="${escapeHtml(facebookHref)}" target="_blank" rel="noreferrer">Visit Facebook page <span aria-hidden="true">↗</span></a>` : '';
   const preview = court.image_src
     ? `<img src="${escapeHtml(court.image_src)}" alt="${escapeHtml(court.image_alt || `Preview of ${court.name}`)}" loading="lazy">`
     : `<div class="court-preview__fallback" aria-label="Photo for ${escapeHtml(court.name)} coming soon" role="img"><span>Venue photo</span><strong>Coming soon</strong></div>`;

@@ -1,5 +1,7 @@
 # Tagum Pickleball Court Directory — Planning
 
+> **Historical plan:** This document records the original static JSON-based v1 plan. The live project now uses Supabase for court data, photos, and the private `/admin` editor. Use the README and `docs/SUPABASE-SETUP.md` for current setup and deployment guidance.
+
 ## 1. Project Summary
 
 Pickleball courts in Tagum City are booked across a scattered mix of platforms — some on PickleHub, some on custom-built sites, and many only reachable through a Facebook page or a phone number. There is no single place to see what courts exist and where to go to check them out. This project is a static, single-page directory that lists every known pickleball court in Tagum City, lets people search and filter by area or court type, and links out to each court's actual booking method. It solves a discovery problem, not a booking problem — the site itself never takes a reservation, an account, or a payment.

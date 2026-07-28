@@ -3,5 +3,8 @@ node_modules/
 dist/
 .astro/
 .env
+.env.local
+.env.*
+!.env.example
 
 .vercel
