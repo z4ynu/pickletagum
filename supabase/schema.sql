@@ -18,6 +18,7 @@ create table public.courts (
   link text not null,
   facebook_link text,
   note text not null,
+  is_coming_soon boolean not null default false,
   last_verified date not null default current_date,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

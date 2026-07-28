@@ -25,4 +25,5 @@ footer { padding:33px 0; color:rgba(255,255,255,.72); background:var(--ink-2); }
 .court-section .court-card__body { height:calc(100% - 178px); min-height:0; }
 .court-section .court-card__body > p { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
 .court-section .court-card__bottom { min-height:42px; }
+.court-section--coming { padding-top:0; }
 @media(max-width:560px){.court-section .court-grid{grid-auto-rows:440px;}}

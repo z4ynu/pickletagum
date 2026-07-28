@@ -1,5 +1,8 @@
 const search = document.querySelector('#court-search');
 const grid = document.querySelector('#court-grid');
+const comingSoonGrid = document.querySelector('#coming-soon-grid');
+const comingSoonSection = document.querySelector('#coming-soon-section');
+const comingSoonCount = document.querySelector('#coming-soon-count');
 const count = document.querySelector('#results-count');
 const empty = document.querySelector('#empty-state');
 const areaFilter = document.querySelector('#area-filter');
@@ -41,10 +44,15 @@ function update() {
   const visible = courts.filter((court) => (selectedArea === 'all' || court.area === selectedArea)
     && (selectedTypes.size === 0 || court.types.some((type) => selectedTypes.has(type)))
     && `${court.name} ${court.area}`.toLowerCase().includes(term));
-  grid.innerHTML = visible.map(cardMarkup).join('');
-  count.textContent = `${visible.length} ${visible.length === 1 ? 'place' : 'places'} listed`;
-  empty.hidden = visible.length !== 0;
-  if (!visible.length) empty.textContent = courts.length ? 'No courts match that search yet. Try another area or clear a filter.' : 'No courts have been added yet.';
+  const available = visible.filter((court) => !court.is_coming_soon);
+  const comingSoon = visible.filter((court) => court.is_coming_soon);
+  grid.innerHTML = available.map(cardMarkup).join('');
+  comingSoonGrid.innerHTML = comingSoon.map(cardMarkup).join('');
+  count.textContent = `${available.length} ${available.length === 1 ? 'place' : 'places'} listed`;
+  comingSoonCount.textContent = `${comingSoon.length} ${comingSoon.length === 1 ? 'place' : 'places'} announced`;
+  comingSoonSection.hidden = comingSoon.length === 0;
+  empty.hidden = available.length !== 0;
+  if (!available.length) empty.textContent = courts.length ? 'No available courts match that search yet. Try another area or clear a filter.' : 'No courts have been added yet.';
 }
 
 function addAreaButtons() {
