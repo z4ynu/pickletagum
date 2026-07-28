@@ -7,6 +7,8 @@ const comingSoonCount = document.querySelector('#coming-soon-count');
 const count = document.querySelector('#results-count');
 const empty = document.querySelector('#empty-state');
 const areaFilter = document.querySelector('#area-filter');
+const moreAreasFilter = document.querySelector('.more-areas-filter');
+const moreAreasList = document.querySelector('.more-areas-filter__list');
 const mobileAreaFilter = document.querySelector('.mobile-area-filter');
 const mobileAreaSummary = document.querySelector('#mobile-area-summary');
 const detailsDialog = document.querySelector('#court-details-dialog');
@@ -83,16 +85,19 @@ function setLoading(isLoading) {
 
 function addAreaButtons() {
   const areas = [...new Set(courts.map((court) => court.area))].sort((a, b) => a.localeCompare(b));
+  const visibleAreaLimit = 5;
   areaFilter.querySelectorAll('[data-area]:not([data-area="all"])').forEach((button) => button.remove());
-  areas.forEach((area) => {
+  areas.forEach((area, index) => {
     const button = document.createElement('button');
     button.className = 'filter-chip';
     button.dataset.area = area;
     button.type = 'button';
     button.setAttribute('aria-pressed', 'false');
     button.textContent = area;
-    areaFilter.append(button);
+    if (index < visibleAreaLimit) areaFilter.insertBefore(button, moreAreasFilter);
+    else moreAreasList.append(button);
   });
+  if (moreAreasFilter) moreAreasFilter.hidden = areas.length <= visibleAreaLimit;
 }
 
 function syncAreaDropdown() {
@@ -124,6 +129,7 @@ document.addEventListener('click', (event) => {
       item.setAttribute('aria-pressed', String(active));
     });
     if (mobileAreaSummary) mobileAreaSummary.textContent = `Area: ${button.textContent}`;
+    if (moreAreasFilter) moreAreasFilter.open = false;
     if (window.matchMedia('(max-width: 560px)').matches && mobileAreaFilter) mobileAreaFilter.open = false;
   } else if (button.dataset.type) {
     if (selectedTypes.has(button.dataset.type)) selectedTypes.delete(button.dataset.type); else selectedTypes.add(button.dataset.type);
