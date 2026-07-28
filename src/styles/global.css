@@ -101,4 +101,4 @@ footer { padding:33px 0; color:rgba(255,255,255,.72); background:var(--ink-2); }
 @media(max-width:560px){.mobile-court-card__preview{cursor:zoom-in;}.court-details-dialog__content{padding:18px;}}
 
 .court-action-button--unavailable { color:#718078!important; background:#d9ddd5; border-color:#d9ddd5!important; cursor:not-allowed; filter:grayscale(1); }
-@media(min-width:561px){.court-grid--grid{grid-auto-rows:400px;}.court-grid--grid .court-card__body{padding:14px 16px 15px;}.court-grid--grid .court-card h2{margin:8px 0 9px;}.court-grid--grid .court-card__bottom{min-height:0;}}
+@media(min-width:561px){.court-grid--grid{grid-auto-rows:370px;}.court-grid--grid .court-card__body{padding:14px 16px 15px;}.court-grid--grid .court-card h2{margin:8px 0 9px;}.court-grid--grid .court-card__bottom{min-height:0;margin-top:14px;}}
