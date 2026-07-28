@@ -86,6 +86,27 @@ footer { padding:33px 0; color:rgba(255,255,255,.72); background:var(--ink-2); }
   .court-section .court-grid.court-grid--list .court-card__bottom { min-height:0; justify-content:flex-start; margin-top:14px; }
   .court-grid--list .court-actions { max-width:350px; }
 }
+@media(min-width:801px){
+  /* List view reads left to right: image, venue details, then the actions. */
+  .court-section .court-grid.court-grid--list .court-card__body{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(250px,350px);
+    grid-template-rows:auto auto 1fr;
+    column-gap:24px;
+    align-items:start;
+  }
+  .court-section .court-grid.court-grid--list .court-card__topline,
+  .court-section .court-grid.court-grid--list .court-card h2,
+  .court-section .court-grid.court-grid--list .court-card .court-meta{grid-column:1;}
+  .court-section .court-grid.court-grid--list .court-card__bottom{
+    grid-column:2;
+    grid-row:1 / span 3;
+    width:100%;
+    margin:0;
+    align-self:center;
+  }
+  .court-section .court-grid.court-grid--list .court-actions{width:100%;max-width:none;}
+}
 @media(max-width:560px){
   .directory-tools { align-items:flex-start; width:100%; }.view-toggle { display:none; }
   .disclaimer { padding:20px 18px; }.disclaimer p { font-size:.9rem; }.disclaimer__close { width:26px; height:26px; }
