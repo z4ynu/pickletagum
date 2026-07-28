@@ -14,7 +14,12 @@ const selectedTypes = new Set();
 
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 const isExternal = (value) => /^https?:\/\//i.test(value || '');
-const safeHref = (value) => /^(https?:\/\/|tel:|mailto:|\/)/i.test(String(value ?? '').trim()) ? String(value).trim() : '';
+const safeHref = (value) => {
+  const href = String(value ?? '').trim();
+  if (/^(https?:\/\/|tel:|mailto:|\/)/i.test(href)) return href;
+  if (/^(?:www\.)?[a-z0-9][a-z0-9.-]*\.[a-z]{2,}(?:[/?#].*)?$/i.test(href)) return `https://${href}`;
+  return '';
+};
 const formatPrice = (value) => {
   const raw = String(value ?? '').trim();
   if (!raw || raw.includes('₱')) return raw;
