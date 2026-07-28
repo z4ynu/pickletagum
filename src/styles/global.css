@@ -27,3 +27,7 @@ footer { padding:33px 0; color:rgba(255,255,255,.72); background:var(--ink-2); }
 .court-section .court-card__bottom { min-height:42px; }
 .court-section--coming { padding-top:0; }
 @media(max-width:560px){.court-section .court-grid{grid-auto-rows:440px;}}
+
+/* The area list grows as new venues are added; keep court-type filters on a clear row. */
+.filter-bar { align-items:flex-start; flex-direction:column; }
+.filter-group--type { justify-content:flex-start; }
