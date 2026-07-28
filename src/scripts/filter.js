@@ -12,10 +12,17 @@ const selectedTypes = new Set();
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 const isExternal = (value) => /^https?:\/\//i.test(value || '');
 const formatDate = (value) => value ? new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${value}T12:00:00`)) : '';
+const formatPrice = (value) => {
+  const raw = String(value ?? '').trim();
+  if (!raw || raw.includes('₱')) return raw;
+  const amount = raw.replace(/\/?\s*(hr|hour)s?\.?$/i, '').trim();
+  if (!/^\d+(?:\s*[-–]\s*\d+)?$/.test(amount)) return raw;
+  return `₱${amount.replace(/\s*[-–]\s*/, '–')}/hr.`;
+};
 
 function cardMarkup(court) {
   const types = Array.isArray(court.types) ? court.types : [];
-  const details = [court.court_count > 0 ? `${court.court_count} ${court.court_count === 1 ? 'court' : 'courts'}` : '', court.price_range].filter(Boolean);
+  const details = [court.court_count > 0 ? `${court.court_count} ${court.court_count === 1 ? 'court' : 'courts'}` : '', formatPrice(court.price_range)].filter(Boolean);
   const booking = court.link ? `<a href="${escapeHtml(court.link)}"${isExternal(court.link) ? ' target="_blank" rel="noreferrer"' : ''}>${escapeHtml(labels[court.booking_method] || 'Visit booking site')} <span aria-hidden="true">↗</span></a>` : '';
   const facebook = court.facebook_link ? `<a class="court-actions__facebook" href="${escapeHtml(court.facebook_link)}" target="_blank" rel="noreferrer">Visit Facebook page <span aria-hidden="true">↗</span></a>` : '';
   const preview = court.image_src
