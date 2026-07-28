@@ -1,37 +1,101 @@
 const search = document.querySelector('#court-search');
-const cards = [...document.querySelectorAll('[data-court]')];
+const grid = document.querySelector('#court-grid');
 const count = document.querySelector('#results-count');
 const empty = document.querySelector('#empty-state');
+const areaFilter = document.querySelector('#area-filter');
+const config = window.PICKLETAGUM_SUPABASE;
+const labels = { pickle_hub: 'Book on PickleHub', custom_site: 'Visit booking site', facebook: 'Open Facebook', phone: 'Call venue' };
+let courts = [];
 let selectedArea = 'all';
 const selectedTypes = new Set();
 
-function update() {
-  const term = search.value.trim().toLowerCase();
-  let visible = 0;
-  cards.forEach((card) => {
-    const matches = (selectedArea === 'all' || card.dataset.area === selectedArea)
-      && (selectedTypes.size === 0 || card.dataset.types.split(',').some((type) => selectedTypes.has(type)))
-      && card.dataset.search.includes(term);
-    card.hidden = !matches;
-    if (matches) visible += 1;
-  });
-  count.textContent = `${visible} ${visible === 1 ? 'place' : 'places'} listed`;
-  empty.hidden = visible !== 0;
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+const isExternal = (value) => /^https?:\/\//i.test(value || '');
+const formatDate = (value) => value ? new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${value}T12:00:00`)) : '';
+
+function cardMarkup(court) {
+  const types = Array.isArray(court.types) ? court.types : [];
+  const details = [court.court_count > 0 ? `${court.court_count} ${court.court_count === 1 ? 'court' : 'courts'}` : '', court.price_range].filter(Boolean);
+  const booking = court.link ? `<a href="${escapeHtml(court.link)}"${isExternal(court.link) ? ' target="_blank" rel="noreferrer"' : ''}>${escapeHtml(labels[court.booking_method] || 'Visit booking site')} <span aria-hidden="true">↗</span></a>` : '';
+  const facebook = court.facebook_link ? `<a class="court-actions__facebook" href="${escapeHtml(court.facebook_link)}" target="_blank" rel="noreferrer">Visit Facebook page <span aria-hidden="true">↗</span></a>` : '';
+  const preview = court.image_src
+    ? `<img src="${escapeHtml(court.image_src)}" alt="${escapeHtml(court.image_alt || `Preview of ${court.name}`)}" loading="lazy">`
+    : `<div class="court-preview__fallback" aria-label="Photo for ${escapeHtml(court.name)} coming soon" role="img"><span>Venue photo</span><strong>Coming soon</strong></div>`;
+
+  return `<article class="court-card booking--${escapeHtml(court.booking_method)}" data-court data-area="${escapeHtml(court.area)}" data-types="${escapeHtml(types.join(','))}" data-search="${escapeHtml(`${court.name} ${court.area}`.toLowerCase())}">
+    <div class="court-preview">${preview}<div class="rally-strip" aria-hidden="true"><span></span><i></i><b></b></div><span class="court-preview__badge">${escapeHtml(types.join(' + '))}</span></div>
+    <div class="court-card__body"><div class="court-card__topline"><span>${escapeHtml(court.area)}</span></div><h2>${escapeHtml(court.name)}</h2>
+    ${details.length ? `<div class="court-meta">${details.map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}</div>` : ''}
+    <p>${escapeHtml(court.note)}</p><div class="court-card__bottom">${court.last_verified ? `<time datetime="${escapeHtml(court.last_verified)}">Checked ${escapeHtml(formatDate(court.last_verified))}</time>` : '<span></span>'}<div class="court-actions">${booking}${facebook}</div></div></div></article>`;
 }
 
-document.querySelectorAll('.filter-chip').forEach((button) => {
-  button.addEventListener('click', () => {
-    if (button.dataset.area) {
-      selectedArea = button.dataset.area;
-      document.querySelectorAll('[data-area]').forEach((item) => {
-        if (item.classList.contains('filter-chip')) { item.classList.toggle('is-active', item === button); item.setAttribute('aria-pressed', item === button); }
-      });
-    } else {
-      if (selectedTypes.has(button.dataset.type)) { selectedTypes.delete(button.dataset.type); } else { selectedTypes.add(button.dataset.type); }
-      document.querySelectorAll('[data-type]').forEach((item) => { const active = selectedTypes.has(item.dataset.type); item.classList.toggle('is-active', active); item.setAttribute('aria-pressed', active); });
-    }
-    update();
+function update() {
+  const term = search.value.trim().toLowerCase();
+  const visible = courts.filter((court) => (selectedArea === 'all' || court.area === selectedArea)
+    && (selectedTypes.size === 0 || court.types.some((type) => selectedTypes.has(type)))
+    && `${court.name} ${court.area}`.toLowerCase().includes(term));
+  grid.innerHTML = visible.map(cardMarkup).join('');
+  count.textContent = `${visible.length} ${visible.length === 1 ? 'place' : 'places'} listed`;
+  empty.hidden = visible.length !== 0;
+  if (!visible.length) empty.textContent = courts.length ? 'No courts match that search yet. Try another area or clear a filter.' : 'No courts have been added yet.';
+}
+
+function addAreaButtons() {
+  const areas = [...new Set(courts.map((court) => court.area))].sort((a, b) => a.localeCompare(b));
+  areaFilter.querySelectorAll('[data-area]:not([data-area="all"])').forEach((button) => button.remove());
+  areas.forEach((area) => {
+    const button = document.createElement('button');
+    button.className = 'filter-chip';
+    button.dataset.area = area;
+    button.type = 'button';
+    button.setAttribute('aria-pressed', 'false');
+    button.textContent = area;
+    areaFilter.append(button);
   });
+}
+
+document.addEventListener('click', (event) => {
+  const button = event.target.closest('.filter-chip');
+  if (!button) return;
+  if (button.dataset.area) {
+    selectedArea = button.dataset.area;
+    document.querySelectorAll('[data-area].filter-chip').forEach((item) => {
+      const active = item === button;
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
+  } else if (button.dataset.type) {
+    if (selectedTypes.has(button.dataset.type)) selectedTypes.delete(button.dataset.type); else selectedTypes.add(button.dataset.type);
+    document.querySelectorAll('[data-type].filter-chip').forEach((item) => {
+      const active = selectedTypes.has(item.dataset.type);
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
+  }
+  update();
 });
+
 search.addEventListener('input', update);
 document.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); search.focus(); } });
+
+async function loadCourts() {
+  if (!config?.url || !config?.key || !window.supabase) {
+    count.textContent = 'Courts unavailable';
+    empty.textContent = 'The court directory is not configured yet.';
+    empty.hidden = false;
+    return;
+  }
+  const client = window.supabase.createClient(config.url, config.key);
+  const { data, error } = await client.from('courts').select('*').order('name');
+  if (error) {
+    count.textContent = 'Courts unavailable';
+    empty.textContent = 'Could not load the court directory. Please try again shortly.';
+    empty.hidden = false;
+    return;
+  }
+  courts = data || [];
+  addAreaButtons();
+  update();
+}
+
+loadCourts();
