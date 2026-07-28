@@ -1,9 +1,12 @@
 <section class="filter-wrap shell" aria-label="Court filters">
   <div class="filter-bar">
-    <div class="filter-group" id="area-filter" role="group" aria-label="Filter by area">
-      <span class="filter-label">Area</span>
-      <button class="filter-chip is-active" data-area="all" type="button" aria-pressed="true">Everywhere</button>
-    </div>
+    <details class="mobile-area-filter" open>
+      <summary id="mobile-area-summary">Area: Everywhere</summary>
+      <div class="filter-group filter-group--area" id="area-filter" role="group" aria-label="Filter by area">
+        <span class="filter-label">Area</span>
+        <button class="filter-chip is-active" data-area="all" type="button" aria-pressed="true">Everywhere</button>
+      </div>
+    </details>
     <div class="filter-group filter-group--type" role="group" aria-label="Filter by court type">
       <span class="filter-label">Court</span>
       <button class="filter-chip" data-type="indoor" type="button" aria-pressed="false">Indoor</button>

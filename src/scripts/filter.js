@@ -6,6 +6,8 @@ const comingSoonCount = document.querySelector('#coming-soon-count');
 const count = document.querySelector('#results-count');
 const empty = document.querySelector('#empty-state');
 const areaFilter = document.querySelector('#area-filter');
+const mobileAreaFilter = document.querySelector('.mobile-area-filter');
+const mobileAreaSummary = document.querySelector('#mobile-area-summary');
 const config = window.PICKLETAGUM_SUPABASE;
 const labels = { pickle_hub: 'Book on PickleHub', custom_site: 'Visit booking site', facebook: 'Open Facebook', phone: 'Call venue' };
 let courts = [];
@@ -81,6 +83,11 @@ function addAreaButtons() {
   });
 }
 
+function syncAreaDropdown() {
+  if (!mobileAreaFilter) return;
+  mobileAreaFilter.open = !window.matchMedia('(max-width: 560px)').matches;
+}
+
 document.addEventListener('click', (event) => {
   const button = event.target.closest('.filter-chip');
   if (!button) return;
@@ -91,6 +98,8 @@ document.addEventListener('click', (event) => {
       item.classList.toggle('is-active', active);
       item.setAttribute('aria-pressed', String(active));
     });
+    if (mobileAreaSummary) mobileAreaSummary.textContent = `Area: ${button.textContent}`;
+    if (window.matchMedia('(max-width: 560px)').matches) mobileAreaFilter.open = false;
   } else if (button.dataset.type) {
     if (selectedTypes.has(button.dataset.type)) selectedTypes.delete(button.dataset.type); else selectedTypes.add(button.dataset.type);
     document.querySelectorAll('[data-type].filter-chip').forEach((item) => {
@@ -122,6 +131,7 @@ async function loadCourts() {
     if (!response.ok) throw new Error(`Could not load courts (${response.status})`);
     courts = await response.json();
     addAreaButtons();
+    syncAreaDropdown();
     update();
   } catch (error) {
     count.textContent = 'Courts unavailable';
@@ -135,3 +145,4 @@ async function loadCourts() {
 }
 
 loadCourts();
+window.addEventListener('resize', syncAreaDropdown);
