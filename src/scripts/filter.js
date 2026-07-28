@@ -41,8 +41,9 @@ function cardMarkup(court) {
   const details = [court.court_count > 0 ? `${court.court_count} ${court.court_count === 1 ? 'court' : 'courts'}` : '', formatPrice(court.price_range)].filter(Boolean);
   const bookingHref = safeHref(court.link);
   const facebookHref = safeHref(court.facebook_link);
-  const booking = bookingHref ? `<a class="court-action-button" href="${escapeHtml(bookingHref)}"${isExternal(bookingHref) ? ' target="_blank" rel="noreferrer"' : ''}>${escapeHtml(labels[court.booking_method] || 'Visit booking site')} <span aria-hidden="true">&rarr;</span></a>` : '';
-  const facebook = facebookHref ? `<a class="court-action-button court-action-button--facebook" href="${escapeHtml(facebookHref)}" target="_blank" rel="noreferrer">Visit Facebook page <span aria-hidden="true">&rarr;</span></a>` : '';
+  const unavailableAction = (label) => `<span class="court-action-button court-action-button--unavailable" aria-disabled="true" title="No link available">${label}</span>`;
+  const booking = bookingHref ? `<a class="court-action-button" href="${escapeHtml(bookingHref)}"${isExternal(bookingHref) ? ' target="_blank" rel="noreferrer"' : ''}>${escapeHtml(labels[court.booking_method] || 'Visit booking site')} <span aria-hidden="true">&rarr;</span></a>` : unavailableAction('Booking unavailable');
+  const facebook = facebookHref ? `<a class="court-action-button court-action-button--facebook" href="${escapeHtml(facebookHref)}" target="_blank" rel="noreferrer">Visit Facebook page <span aria-hidden="true">&rarr;</span></a>` : unavailableAction('Facebook unavailable');
   const preview = court.image_src
     ? `<img src="${escapeHtml(court.image_src)}" alt="${escapeHtml(court.image_alt || `Preview of ${court.name}`)}" loading="lazy">`
     : `<div class="court-preview__fallback" aria-label="Photo for ${escapeHtml(court.name)} coming soon" role="img"><span>Venue photo</span><strong>Coming soon</strong></div>`;
