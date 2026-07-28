@@ -2,6 +2,7 @@
 
 1. In Supabase, open **SQL Editor → New query**.
 2. Paste and run `supabase/schema.sql`.
+3. Paste and run `supabase/seed-courts.sql` to import the eight starter listings.
 3. Go to **Authentication → URL Configuration** and add your Vercel URL and `http://localhost:4321` to Redirect URLs.
 4. Sign in once using the email you want to administer the directory.
 5. In SQL Editor, run this, replacing the email:
