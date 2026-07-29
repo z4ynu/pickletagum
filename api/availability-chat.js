@@ -58,12 +58,21 @@ export default async function handler(request, response) {
       }),
     });
     const data = await modelResponse.json();
-    if (!modelResponse.ok) throw new Error(data?.error?.message || 'OpenAI request failed');
+    if (!modelResponse.ok) {
+      const error = new Error(data?.error?.message || 'OpenAI request failed');
+      error.status = modelResponse.status;
+      error.type = data?.error?.type;
+      throw error;
+    }
     const answer = String(data.output_text || '').trim();
     if (!answer) throw new Error('The assistant returned no answer');
     return response.status(200).json({ answer });
   } catch (error) {
-    console.error('Availability assistant error:', error);
+    console.error('Availability assistant error:', { status: error.status, type: error.type, message: error.message });
+    if (error.status === 401) return response.status(502).json({ error: 'OpenAI rejected the API key. Check the OPENAI_API_KEY value in Vercel, then redeploy.' });
+    if (error.status === 429) return response.status(502).json({ error: 'The OpenAI API project has reached its quota or rate limit. Check its billing and usage limits, then try again.' });
+    if (error.status === 404) return response.status(502).json({ error: 'The configured OpenAI model is unavailable to this API project. Try gpt-5.6-luna or check your project access.' });
+    if (error.status === 400) return response.status(502).json({ error: 'OpenAI could not accept this availability request. Check the model setting and your API project configuration.' });
     return response.status(502).json({ error: 'Could not check availability right now. Please try again or use the court’s official page.' });
   }
 }
