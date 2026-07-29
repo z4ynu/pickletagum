@@ -43,36 +43,42 @@ export default async function handler(request, response) {
 
   const message = typeof request.body?.message === 'string' ? request.body.message.trim() : '';
   if (!message || message.length > 1000) return response.status(400).json({ error: 'Please enter a question of up to 1,000 characters.' });
-  if (!process.env.OPENAI_API_KEY) return response.status(503).json({ error: 'The availability assistant is not configured yet. Please use the court’s official page for now.' });
+  if (!process.env.GEMINI_API_KEY) return response.status(503).json({ error: 'The availability assistant is not configured yet. Please use the court’s official page for now.' });
 
   try {
     const courts = await loadCourts();
-    const modelResponse = await fetch('https://api.openai.com/v1/responses', {
+    const conversation = [...cleanHistory(request.body?.history), { role: 'user', content: message }]
+      .map((item) => `${item.role === 'assistant' ? 'Assistant' : 'User'}: ${item.content}`)
+      .join('\n');
+    const modelResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+      headers: { 'x-goog-api-key': process.env.GEMINI_API_KEY, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: process.env.OPENAI_AVAILABILITY_MODEL || 'gpt-5.6-luna',
-        tools: [{ type: 'web_search' }],
-        instructions: `You are TagumPickle's availability assistant. Reply in the user's language (Bisaya, Tagalog, English, or mixed). You help people find pickleball courts in Tagum City only. You may use web search to inspect public information, but never log in, bypass a paywall, attempt a booking, submit a form, send a message, or handle payments. Treat booking availability as time-sensitive: do not state that a court is available unless a public source explicitly supports it for the requested date and time. If it cannot be verified, say so clearly and direct the user to the official booking/contact link. Never invent schedules, prices, availability, court details, or sources. Keep the answer concise and include the court's official link when one is in the directory. End any availability answer with a brief reminder to confirm directly with the venue. Current directory data: ${JSON.stringify(courts)}`,
-        input: [...cleanHistory(request.body?.history), { role: 'user', content: message }],
+        model: process.env.GEMINI_AVAILABILITY_MODEL || 'gemini-3.1-flash-lite',
+        tools: [{ type: 'google_search' }],
+        input: `You are TagumPickle's availability assistant. Reply in the user's language (Bisaya, Tagalog, English, or mixed). You help people find pickleball courts in Tagum City only. You may use Google Search to inspect public information, but never log in, bypass a paywall, attempt a booking, submit a form, send a message, or handle payments. Treat booking availability as time-sensitive: do not state that a court is available unless a public source explicitly supports it for the requested date and time. If it cannot be verified, say so clearly and direct the user to the official booking/contact link. Never invent schedules, prices, availability, court details, or sources. Keep the answer concise and include the court's official link when one is in the directory. End any availability answer with a brief reminder to confirm directly with the venue. Current directory data: ${JSON.stringify(courts)}\n\nConversation:\n${conversation}`,
       }),
     });
     const data = await modelResponse.json();
     if (!modelResponse.ok) {
-      const error = new Error(data?.error?.message || 'OpenAI request failed');
+      const error = new Error(data?.error?.message || 'Gemini request failed');
       error.status = modelResponse.status;
       error.type = data?.error?.type;
       throw error;
     }
-    const answer = String(data.output_text || '').trim();
+    const outputBlocks = (data.steps || [])
+      .filter((step) => step.type === 'model_output')
+      .flatMap((step) => step.content || [])
+      .filter((block) => block.type === 'text');
+    const answer = String(data.output_text || outputBlocks.map((block) => block.text || '').join('\n') || '').trim();
     if (!answer) throw new Error('The assistant returned no answer');
     return response.status(200).json({ answer });
   } catch (error) {
     console.error('Availability assistant error:', { status: error.status, type: error.type, message: error.message });
-    if (error.status === 401) return response.status(502).json({ error: 'OpenAI rejected the API key. Check the OPENAI_API_KEY value in Vercel, then redeploy.' });
-    if (error.status === 429) return response.status(502).json({ error: 'The OpenAI API project has reached its quota or rate limit. Check its billing and usage limits, then try again.' });
-    if (error.status === 404) return response.status(502).json({ error: 'The configured OpenAI model is unavailable to this API project. Try gpt-5.6-luna or check your project access.' });
-    if (error.status === 400) return response.status(502).json({ error: 'OpenAI could not accept this availability request. Check the model setting and your API project configuration.' });
+    if (error.status === 401 || error.status === 403) return response.status(502).json({ error: 'Gemini rejected the API key. Check the GEMINI_API_KEY value in Vercel, then redeploy.' });
+    if (error.status === 429) return response.status(502).json({ error: 'Gemini has reached its free-tier limit. Please try again later.' });
+    if (error.status === 404) return response.status(502).json({ error: 'The configured Gemini model is unavailable to this API project. Try gemini-3.1-flash-lite or check your project access.' });
+    if (error.status === 400) return response.status(502).json({ error: 'Gemini could not accept this availability request. Check the model setting and your API project configuration.' });
     return response.status(502).json({ error: 'Could not check availability right now. Please try again or use the court’s official page.' });
   }
 }
