@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Analytics from '@vercel/analytics/astro';
 
 const { title = 'PickleTagum — Pickleball courts in Tagum City' } = Astro.props;
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
@@ -16,6 +17,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
     <title>{title}</title>
     <script define:vars={{ supabaseUrl, supabaseKey }}>window.PICKLETAGUM_SUPABASE = { url: supabaseUrl, key: supabaseKey };</script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <Analytics />
   </head>
   <body>
     <slot />
