@@ -1,0 +1,23 @@
+<section class="assistant shell" aria-labelledby="assistant-heading">
+  <div class="assistant__intro">
+    <p class="eyebrow eyebrow--dark"><span></span>Beta helper</p>
+    <h2 id="assistant-heading">Ask about court availability</h2>
+    <p>Ask in Bisaya, Tagalog, or English. The assistant checks public information only and never books for you.</p>
+  </div>
+  <div class="assistant__panel">
+    <div class="assistant__messages" id="assistant-messages" role="log" aria-live="polite">
+      <div class="assistant__message assistant__message--bot">Hi! Pwede ka mangutana ug available courts, dates, times, or indoor/outdoor options. I’ll only share availability that I can verify from public sources—please still confirm with the venue.</div>
+    </div>
+    <div class="assistant__suggestions" aria-label="Example questions">
+      <button type="button" data-assistant-prompt="Naa bay indoor court available this Saturday at 7 PM?">Indoor this Saturday</button>
+      <button type="button" data-assistant-prompt="May outdoor court ba bukas ng 6 PM?">Outdoor tomorrow</button>
+      <button type="button" data-assistant-prompt="Which Tagum courts can I contact for a game tonight?">Courts tonight</button>
+    </div>
+    <form class="assistant__form" id="assistant-form">
+      <label class="sr-only" for="assistant-input">Ask the availability assistant</label>
+      <textarea id="assistant-input" rows="2" maxlength="1000" placeholder="e.g. Naa bay court available ugma 7 PM?" required></textarea>
+      <button type="submit" id="assistant-submit">Ask</button>
+    </form>
+    <p class="assistant__notice">Availability is an estimate based on public information. Reservations, payments, and final confirmation happen directly with each court.</p>
+  </div>
+</section>
