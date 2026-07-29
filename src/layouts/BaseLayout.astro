@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import SpeedInsights from '@vercel/speed-insights/astro';
 
 const { title = 'PickleTagum — Pickleball courts in Tagum City' } = Astro.props;
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
@@ -19,5 +20,6 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
   </head>
   <body>
     <slot />
+    <SpeedInsights />
   </body>
 </html>
