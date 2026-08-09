@@ -71,8 +71,8 @@ function matchesCourtCount(courtCount) {
   return [...selectedCourtCounts].some((bucket) => (
     (bucket === '1' && courtCount === 1)
     || (bucket === '2' && courtCount === 2)
-    || (bucket === '3-4' && courtCount >= 3 && courtCount <= 4)
-    || (bucket === '5+' && courtCount >= 5)
+    || (bucket === '3' && courtCount === 3)
+    || (bucket === '4+' && courtCount >= 4)
   ));
 }
 
