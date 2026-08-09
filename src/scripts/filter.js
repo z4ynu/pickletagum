@@ -1,3 +1,5 @@
+import { createClient } from '@supabase/supabase-js';
+
 const search = document.querySelector('#court-search');
 const grid = document.querySelector('#court-grid');
 const loading = document.querySelector('#court-loading');
@@ -51,7 +53,7 @@ function cardMarkup(court) {
     ? `<img src="${escapeHtml(court.image_src)}" alt="${escapeHtml(court.image_alt || `Preview of ${court.name}`)}" loading="lazy">`
     : `<div class="court-preview__fallback" aria-label="Photo for ${escapeHtml(court.name)} coming soon" role="img"><span>Venue photo</span><strong>Coming soon</strong></div>`;
   const mobilePreview = court.image_src
-    ? `<img src="${escapeHtml(court.image_src)}" alt="${escapeHtml(court.image_alt || `Preview of ${court.name}`)}" loading="lazy">`
+    ? `<img src="${escapeHtml(court.image_src)}" alt="" loading="lazy">`
     : `<span class="mobile-court-card__fallback" aria-hidden="true">Coming soon</span>`;
   const meta = details.length ? `<div class="court-meta">${details.map((detail) => `<span>${escapeHtml(detail)}</span>`).join('')}</div>` : '';
   const comingClass = court.is_coming_soon ? ' court-card--coming' : '';
@@ -59,7 +61,7 @@ function cardMarkup(court) {
     <div class="court-preview"><button class="court-preview-button" type="button" data-court-detail="${escapeHtml(court.id)}" aria-label="View details for ${escapeHtml(court.name)}">${preview}</button><div class="rally-strip" aria-hidden="true"><span></span><i></i><b></b></div>${court.is_coming_soon ? '' : `<span class="court-preview__badge">${escapeHtml(types.join(' + '))}</span>`}</div>
     <div class="court-card__body"><div class="court-card__topline"><span>${escapeHtml(court.area)}</span></div><h2>${escapeHtml(court.name)}</h2>${meta}<div class="court-card__bottom"><div class="court-actions">${booking}${facebook}</div></div></div>
   </article>`;
-  const mobileCard = `<details class="mobile-court-card${court.is_coming_soon ? ' mobile-court-card--coming' : ''}"><summary><span class="mobile-court-card__copy"><span>${escapeHtml(court.area)}</span><strong>${escapeHtml(court.name)}</strong></span><span class="mobile-court-card__preview" data-court-detail="${escapeHtml(court.id)}" role="button" tabindex="0" aria-label="View details for ${escapeHtml(court.name)}">${mobilePreview}</span></summary><div class="mobile-court-card__details">${meta}${booking || facebook ? `<div class="court-actions">${booking}${facebook}</div>` : ''}</div></details>`;
+  const mobileCard = `<details class="mobile-court-card${court.is_coming_soon ? ' mobile-court-card--coming' : ''}"><summary><span class="mobile-court-card__copy"><span>${escapeHtml(court.area)}</span><strong>${escapeHtml(court.name)}</strong></span><span class="mobile-court-card__preview" aria-hidden="true">${mobilePreview}</span></summary><div class="mobile-court-card__details">${meta}<button class="mobile-court-card__details-button" type="button" data-court-detail="${escapeHtml(court.id)}">View venue details</button>${booking || facebook ? `<div class="court-actions">${booking}${facebook}</div>` : ''}</div></details>`;
   return `${desktopCard}${mobileCard}`;
 }
 
@@ -172,12 +174,10 @@ async function loadCourts() {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 10000);
   try {
-    const response = await fetch(`${config.url}/rest/v1/courts?select=*&order=name`, {
-      headers: { apikey: config.key, Authorization: `Bearer ${config.key}` },
-      signal: controller.signal,
-    });
-    if (!response.ok) throw new Error(`Could not load courts (${response.status})`);
-    courts = await response.json();
+    const client = createClient(config.url, config.key);
+    const { data, error } = await client.from('courts').select('*').order('name').abortSignal(controller.signal);
+    if (error) throw error;
+    courts = data || [];
     addAreaButtons();
     syncAreaDropdown();
     setLoading(false);

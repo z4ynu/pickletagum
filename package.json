@@ -12,6 +12,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.2",
     "@vercel/analytics": "^2.0.1",
     "astro": "^4.16.0"
   }
