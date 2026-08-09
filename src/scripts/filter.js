@@ -23,6 +23,7 @@ const labels = { pickle_hub: 'Book on PickleHub', custom_site: 'Visit booking si
 let courts = [];
 let selectedArea = 'all';
 const selectedTypes = new Set();
+const selectedCourtCounts = new Set();
 let lastDetailTrigger = null;
 
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
@@ -61,14 +62,25 @@ function cardMarkup(court) {
     <div class="court-preview"><button class="court-preview-button" type="button" data-court-detail="${escapeHtml(court.id)}" aria-label="View details for ${escapeHtml(court.name)}">${preview}</button><div class="rally-strip" aria-hidden="true"><span></span><i></i><b></b></div>${court.is_coming_soon ? '' : `<span class="court-preview__badge">${escapeHtml(types.join(' + '))}</span>`}</div>
     <div class="court-card__body"><div class="court-card__topline"><span>${escapeHtml(court.area)}</span></div><h2>${escapeHtml(court.name)}</h2>${meta}<div class="court-card__bottom"><div class="court-actions">${booking}${facebook}</div></div></div>
   </article>`;
-  const mobileCard = `<details class="mobile-court-card${court.is_coming_soon ? ' mobile-court-card--coming' : ''}"><summary><span class="mobile-court-card__copy"><span>${escapeHtml(court.area)}</span><strong>${escapeHtml(court.name)}</strong></span><span class="mobile-court-card__preview" aria-hidden="true">${mobilePreview}</span></summary><div class="mobile-court-card__details">${meta}<button class="mobile-court-card__details-button" type="button" data-court-detail="${escapeHtml(court.id)}">View venue details</button>${booking || facebook ? `<div class="court-actions">${booking}${facebook}</div>` : ''}</div></details>`;
+  const mobileCard = `<article class="mobile-court-card${court.is_coming_soon ? ' mobile-court-card--coming' : ''}"><div class="mobile-court-card__header"><span class="mobile-court-card__copy"><span>${escapeHtml(court.area)}</span><strong>${escapeHtml(court.name)}</strong></span><span class="mobile-court-card__preview" aria-hidden="true">${mobilePreview}</span></div><div class="mobile-court-card__details">${meta}${booking || facebook ? `<div class="court-actions">${booking}${facebook}</div>` : ''}</div></article>`;
   return `${desktopCard}${mobileCard}`;
+}
+
+function matchesCourtCount(courtCount) {
+  if (selectedCourtCounts.size === 0) return true;
+  return [...selectedCourtCounts].some((bucket) => (
+    (bucket === '1' && courtCount === 1)
+    || (bucket === '2' && courtCount === 2)
+    || (bucket === '3-4' && courtCount >= 3 && courtCount <= 4)
+    || (bucket === '5+' && courtCount >= 5)
+  ));
 }
 
 function update() {
   const term = search.value.trim().toLowerCase();
   const visible = courts.filter((court) => (selectedArea === 'all' || court.area === selectedArea)
     && (selectedTypes.size === 0 || court.types.some((type) => selectedTypes.has(type)))
+    && matchesCourtCount(Number(court.court_count) || 0)
     && `${court.name} ${court.area}`.toLowerCase().includes(term));
   const available = visible.filter((court) => !court.is_coming_soon);
   const comingSoon = visible.filter((court) => court.is_coming_soon);
@@ -142,6 +154,13 @@ document.addEventListener('click', (event) => {
     if (selectedTypes.has(button.dataset.type)) selectedTypes.delete(button.dataset.type); else selectedTypes.add(button.dataset.type);
     document.querySelectorAll('[data-type].filter-chip').forEach((item) => {
       const active = selectedTypes.has(item.dataset.type);
+      item.classList.toggle('is-active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
+  } else if (button.dataset.count) {
+    if (selectedCourtCounts.has(button.dataset.count)) selectedCourtCounts.delete(button.dataset.count); else selectedCourtCounts.add(button.dataset.count);
+    document.querySelectorAll('[data-count].filter-chip').forEach((item) => {
+      const active = selectedCourtCounts.has(item.dataset.count);
       item.classList.toggle('is-active', active);
       item.setAttribute('aria-pressed', String(active));
     });
