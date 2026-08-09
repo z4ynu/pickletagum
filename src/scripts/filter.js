@@ -147,7 +147,7 @@ document.addEventListener('click', (event) => {
       item.classList.toggle('is-active', active);
       item.setAttribute('aria-pressed', String(active));
     });
-    if (mobileAreaSummary) mobileAreaSummary.textContent = `Area: ${button.textContent}`;
+    if (mobileAreaSummary) mobileAreaSummary.textContent = `Location: ${button.textContent}`;
     if (moreAreasFilter && !window.matchMedia('(max-width: 560px)').matches) moreAreasFilter.open = false;
     if (window.matchMedia('(max-width: 560px)').matches && mobileAreaFilter) mobileAreaFilter.open = false;
   } else if (button.dataset.type) {
