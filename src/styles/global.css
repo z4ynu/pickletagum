@@ -95,10 +95,10 @@ footer { padding:33px 0; color:rgba(255,255,255,.72); background:var(--ink-2); }
 .court-section .court-card__body > p { max-height:3.9em; overflow:hidden; overflow-wrap:anywhere; }
 .court-section .court-card__bottom { flex-shrink:0; }
 
-/* Desktop gives Location its own wrapping row, followed by the secondary filters. */
+/* Desktop stacks the filter groups after the full-width Location row. */
 @media(min-width:851px){
-  .filter-bar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; justify-content:start; gap:14px 24px; }
-  .mobile-area-filter { grid-column:1/-1; width:100%; min-width:0; }
+  .filter-bar { display:grid; grid-template-columns:minmax(0,1fr); align-items:start; justify-content:start; gap:14px; }
+  .mobile-area-filter { width:100%; min-width:0; }
   .filter-group--area { flex-wrap:wrap; }
   .filter-group--type,.filter-group--count { justify-content:flex-start; }
   .more-areas-filter { position:relative; flex:none; }
