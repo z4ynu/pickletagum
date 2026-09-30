@@ -1,6 +1,6 @@
 # PickleTagum
 
-An independent directory of pickleball courts in Tagum City. The public site lists courts and links visitors to each venue's own booking or Facebook page. PickleTagum does not accept bookings or payments.
+An independent directory of pickleball courts in Tagum City, Davao del Norte. The public site lists courts and links visitors to each venue's own booking or Facebook page. PickleTagum does not accept bookings or payments.
 
 ## Local development
 
